@@ -8,7 +8,7 @@ interface Address {
   // Add more properties as needed
 }
 
-const apiKey = 'AIzaSyAlCsbcHrd8t87qDnUVzWQEqQYDmuDVmDM';
+const apiKey = '';
 
 export async function getAddressFromCoords(coords: Coordinates): Promise<Address | null> {
   const { latitude, longitude } = coords;
