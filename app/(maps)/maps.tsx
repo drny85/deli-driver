@@ -1,13 +1,16 @@
+import { Button } from '@/components/Button';
 import ETA from '@/components/map/ETA';
 import MapHeader from '@/components/map/MapHeader';
 import { Colors, SIZES } from '@/constants/Colors';
+import { useBackgroundLocation } from '@/hooks/useLocation';
 import { useOrder } from '@/hooks/useOrder';
 import { useLocatioStore } from '@/providers/locationStore';
 import { orders, useOrdersStore } from '@/providers/ordersStore';
 import { Coords, Order, TempOrder } from '@/typing';
+import { actionTitle } from '@/utils/actionTitle';
 import { findUndeliveredOrder } from '@/utils/getNextClosestOrder';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
@@ -25,11 +28,15 @@ let timeOut: NodeJS.Timeout;
 
 const Maps = () => {
   const mapViewRef = useRef<MapView>(null);
+
+  const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const location = useLocatioStore((s) => s.location);
-  const { order } = useOrdersStore();
+  console.log(location);
+  const { getOrder, setOrders, orders } = useOrdersStore();
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
-  const height = useSharedValue(0.15);
+  const height = useSharedValue(0.25);
+  const order = getOrder(orderId);
 
   const [initialRegion, setInitialRegion] = useState<Region>({
     latitude: 40.8306,
@@ -37,8 +44,7 @@ const Maps = () => {
     ...DELTA,
   });
   const [origin, setOrigin] = useState<Coords | null>({
-    latitude: 40.86758,
-    longitude: -73.90475,
+    ...location!,
   });
   // const [destination, setDestination] = useState<Coords | null>({
   //   latitude: 40.85109,
@@ -50,12 +56,38 @@ const Maps = () => {
     longitude: -73.90275,
   });
 
-  const snapshots = useMemo(() => ['15%', '50%', '80%'], []);
+  const snapshots = useMemo(() => ['25%', '50%', '80%'], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const waypoints = useMemo(
     () => (origin && restaurant ? [origin, restaurant] : []),
     [origin, restaurant]
   );
+
+  const onActionPress = () => {
+    if (order?.status === 'Ready For Delivery') {
+      const updatedOrder: TempOrder = { ...order, status: 'Accepted By Courier' };
+      console.log(updatedOrder);
+      setOrders([
+        ...orders.map((o) => {
+          if (o.id === orderId) {
+            return updatedOrder;
+          }
+          return o;
+        }),
+      ]);
+    } else if (order?.status === 'Accepted By Courier') {
+      const updatedNewOrder: TempOrder = { ...order, status: 'Picked By Courier' };
+      setOrders([
+        ...orders.map((o) => {
+          if (o.id === orderId) {
+            return updatedNewOrder;
+          }
+          return o;
+        }),
+      ]);
+      openGoogleMap(order.destination);
+    }
+  };
 
   // const order = useMemo(() => findUndeliveredOrder(orders, origin!), [orders]);
   // console.log(order);
@@ -89,8 +121,8 @@ const Maps = () => {
 
   useEffect(() => {
     if (!origin || !order) return;
-
-    if (order.status === 'Accepted By Courier') {
+    // startLocationTracking();
+    if (order.status === 'Ready For Delivery') {
       mapViewRef.current?.fitToSuppliedMarkers(['origin', 'destination', 'restaurant'], {
         edgePadding: {
           top: 20,
@@ -145,17 +177,14 @@ const Maps = () => {
     <View style={styles.container}>
       <MapHeader
         onCenterPress={() => {
-          // mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant', 'destination'], {
-          //   edgePadding: {
-          //     top: 30,
-          //     right: 30,
-          //     bottom: 50,
-          //     left: 30,
-          //   },
-          // });
-          // setOrders((prev) => [
-          //   ...prev.map((o) => (o.id === order?.id ? { ...order!, status: 'Delivered' } : o)),
-          // ]);
+          mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant', 'destination'], {
+            edgePadding: {
+              top: 30,
+              right: 30,
+              bottom: 50,
+              left: 30,
+            },
+          });
         }}
         onPress={() => {
           openGoogleMap({ ...origin! });
@@ -220,13 +249,16 @@ const Maps = () => {
           } else if (change === 2) {
             height.value = withTiming(0.5);
           } else if (change === 0) {
-            height.value = withTiming(0.15, { duration: 500 });
+            height.value = withTiming(0.25, { duration: 500 });
           }
         }}
         index={0}
         handleIndicatorStyle={{ backgroundColor: Colors.main }}>
         <BottomSheetScrollView
           contentContainerStyle={{ backgroundColor: Colors.white, padding: SIZES.lg }}>
+          <View style={{ width: '60%', alignSelf: 'center', marginBottom: SIZES.lg }}>
+            <Button title={actionTitle(order.status)} onPress={onActionPress} />
+          </View>
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
             <ETA title={distance.toFixed(2)} subtitle="miles" />

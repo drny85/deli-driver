@@ -9,7 +9,7 @@ export const ordersData: TempOrder[] = [
   {
     id: '2',
     destination: { latitude: 40.83399, longitude: -73.90537 }, // Los Angeles
-    status: 'Delivered',
+    status: 'Ready For Delivery',
   },
   {
     id: '3',
@@ -19,12 +19,12 @@ export const ordersData: TempOrder[] = [
   {
     id: '4',
     destination: { latitude: 40.82658, longitude: -73.90762 }, // London
-    status: 'Accepted By Courier',
+    status: 'Ready For Delivery',
   },
   {
     id: '5',
     destination: { latitude: 40.833, longitude: -73.90109 }, // London
-    status: 'Picked By Courier',
+    status: 'Ready For Delivery',
   },
   // Add more orders as needed
 ];

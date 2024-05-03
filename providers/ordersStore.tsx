@@ -1,12 +1,11 @@
 import { TempOrder } from '@/typing';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 type OrdersStore = {
-  order: TempOrder | null;
   orders: TempOrder[];
-  setOrder: (order: TempOrder) => void;
   setOrders: (orders: TempOrder[]) => void;
   addOrder: (order: TempOrder) => void;
   removeOrder: (order: TempOrder) => void;
@@ -22,7 +21,6 @@ export const useOrdersStore = create<OrdersStore>()(
   persist(
     (set, get) => ({
       orders: [],
-      order: null,
       setOrders: (orders: TempOrder[]) => set({ orders }),
       addOrder: (order: TempOrder) => set({ orders: [...get().orders, order] }),
       removeOrder: (order: TempOrder) =>
@@ -34,7 +32,6 @@ export const useOrdersStore = create<OrdersStore>()(
       getOrders: () => get().orders,
       getOrdersCount: () => get().orders.length,
       getOrdersByStatus: (status: string) => get().orders.filter((o) => o.status === status),
-      setOrder: (order: TempOrder) => set({ order }),
     }),
     {
       name: 'orders-storage',

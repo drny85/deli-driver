@@ -1,7 +1,5 @@
-import React from 'react';
 import { Stack } from 'expo-router';
-import { StackScreenWithSearchBar } from '@/constants/layout';
-import SegmentedControlOrders from '@/components/SegmentedControlOrders';
+import React from 'react';
 
 const HomeLayout = () => {
   return (

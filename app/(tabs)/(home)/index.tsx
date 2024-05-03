@@ -1,19 +1,19 @@
 import { Container } from '@/components/Container';
 import NeoView from '@/components/NeoView';
 import NotLocationGranted from '@/components/NotLocationGranted';
-import SegmentedControlOrders from '@/components/SegmentedControlOrders';
 import { Colors, SIZES } from '@/constants/Colors';
 import { ordersData } from '@/constants/ordersData';
 import { useBackgroundLocation } from '@/hooks/useLocation';
-import { useNavigationSearch } from '@/hooks/useNavigationSeach';
 import { useOrdersStore } from '@/providers/ordersStore';
 import { TempOrder } from '@/typing';
+import { metersToMiles } from '@/utils/metersToMiles';
+import { sortOrderByDistance } from '@/utils/sortOrdersByDistance';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
-import { router, Stack } from 'expo-router';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, ListRenderItem, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
+import { FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
 
-const ORDER_OPTIONS = ['All Orders', 'Pending', 'Current'];
+const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current'];
 
 const Home = () => {
   const {
@@ -25,24 +25,27 @@ const Home = () => {
     foregroundPermission,
   } = useBackgroundLocation();
 
-  const { setOrders, orders, setOrder } = useOrdersStore();
+  const { setOrders, orders } = useOrdersStore();
+
   const [option, setOption] = useState(0);
 
   const ordersToRender = useMemo(() => {
-    if (option === 0) return orders;
-    if (option === 1) return orders.filter((o) => o.status === 'Ready For Delivery');
+    if (option === 0) return orders.filter((o) => o.status === 'Ready For Delivery');
+    if (option === 1) return orders.filter((o) => o.status === 'Accepted By Courier');
     if (option === 2) return orders.filter((o) => o.status === 'Picked By Courier');
     return orders;
   }, [option, orders]);
 
-  const renderOrders: ListRenderItem<TempOrder> = useCallback(({ item }) => {
+  // console.log(JSON.stringify(ordersToRender, null, 2));
+
+  const renderOrders: ListRenderItem<TempOrder> = ({ item }) => {
     const disabled = orders.some((o) => o.status === 'Picked By Courier');
+
     return (
       <TouchableOpacity
         disabled={disabled && item.status !== 'Picked By Courier'}
         onPress={() => {
-          setOrder(item);
-          router.push('/(maps)/maps');
+          router.push({ pathname: '/(maps)/maps', params: { orderId: item.id } });
         }}>
         <NeoView
           containerStyle={{
@@ -51,14 +54,20 @@ const Home = () => {
             backgroundColor: item.status === 'Picked By Courier' ? Colors.accent : Colors.primary,
           }}>
           <Text>{item.status}</Text>
+          {item.distance && <Text>{item.distance} km</Text>}
         </NeoView>
       </TouchableOpacity>
     );
-  }, []);
+  };
 
   useEffect(() => {
-    setOrders(ordersData);
-  }, [orders]);
+    const gt = async () => {
+      const or = await sortOrderByDistance(ordersData);
+      setOrders(or);
+    };
+    gt();
+    startLocationTracking();
+  }, []);
 
   if (!backgroundPermission) {
     return <NotLocationGranted onPress={config} />;

@@ -6,6 +6,7 @@ export type Coords = {
 };
 
 export type OrderStatus =
+  | 'Cancelled'
   | 'Ready For Delivery'
   | 'Order Received'
   | 'Processing'
@@ -52,6 +53,7 @@ export type TempOrder = {
   id: string;
   destination: Coords;
   status: OrderStatus;
+  distance?: number;
 };
 
 export enum ORDER_TYPE {
