@@ -3,6 +3,7 @@ import MapHeader from '@/components/map/MapHeader';
 import { Colors, SIZES } from '@/constants/Colors';
 import { useOrder } from '@/hooks/useOrder';
 import { useLocatioStore } from '@/providers/locationStore';
+import { orders, useOrdersStore } from '@/providers/ordersStore';
 import { Coords, Order, TempOrder } from '@/typing';
 import { findUndeliveredOrder } from '@/utils/getNextClosestOrder';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
@@ -20,44 +21,15 @@ const DELTA = {
   longitudeDelta: 0.02,
 };
 
-const ordersData: TempOrder[] = [
-  {
-    id: '1',
-    destination: { latitude: 40.83017, longitude: -73.91595 }, // New York
-    status: 'Accepted By Courier',
-  },
-  {
-    id: '2',
-    destination: { latitude: 40.83399, longitude: -73.90537 }, // Los Angeles
-    status: 'Delivered',
-  },
-  {
-    id: '3',
-    destination: { latitude: 51.5074, longitude: -0.1278 }, // London
-    status: 'Accepted By Courier',
-  },
-  {
-    id: '4',
-    destination: { latitude: 40.82658, longitude: -73.90762 }, // London
-    status: 'Accepted By Courier',
-  },
-  {
-    id: '5',
-    destination: { latitude: 40.833, longitude: -73.90109 }, // London
-    status: 'Accepted By Courier',
-  },
-  // Add more orders as needed
-];
-
 let timeOut: NodeJS.Timeout;
 
 const Maps = () => {
   const mapViewRef = useRef<MapView>(null);
   const location = useLocatioStore((s) => s.location);
+  const { order } = useOrdersStore();
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const height = useSharedValue(0.15);
-  const [orders, setOrders] = useState<TempOrder[]>(ordersData);
 
   const [initialRegion, setInitialRegion] = useState<Region>({
     latitude: 40.8306,
@@ -85,8 +57,8 @@ const Maps = () => {
     [origin, restaurant]
   );
 
-  const order = useMemo(() => findUndeliveredOrder(orders, origin!), [orders]);
-  console.log(order);
+  // const order = useMemo(() => findUndeliveredOrder(orders, origin!), [orders]);
+  // console.log(order);
 
   const openGoogleMap = useCallback(async (route: { latitude: number; longitude: number }) => {
     try {

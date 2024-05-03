@@ -69,7 +69,7 @@ export const useBackgroundLocation = () => {
     try {
       let resf = await Location.requestForegroundPermissionsAsync();
       let resb = await Location.requestBackgroundPermissionsAsync();
-      console.log(resf.status, resb.status);
+
       if (resf.status != 'granted' || resb.status !== 'granted') {
         console.log('Permission to access location was denied');
 

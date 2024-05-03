@@ -6,6 +6,7 @@ export type Coords = {
 };
 
 export type OrderStatus =
+  | 'Ready For Delivery'
   | 'Order Received'
   | 'Processing'
   | 'Picked By Courier'
@@ -16,7 +17,6 @@ export const statusList: OrderStatus[] = [
   'Processing',
   'Accepted By Courier',
   'Picked By Courier',
-
   'Delivered',
 ];
 

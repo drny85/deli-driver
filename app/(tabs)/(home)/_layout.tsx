@@ -1,10 +1,17 @@
 import React from 'react';
 import { Stack } from 'expo-router';
+import { StackScreenWithSearchBar } from '@/constants/layout';
+import SegmentedControlOrders from '@/components/SegmentedControlOrders';
 
 const HomeLayout = () => {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
+    <Stack>
+      <Stack.Screen
+        name="index"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Stack>
   );
 };

@@ -25,6 +25,12 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
+
+  const filteredEnv = Object.fromEntries(
+    Object.entries(process.env).filter(([key, val]) => key.indexOf('EXPO_PUBLIC_') === 0)
+  );
+
+  console.log(filteredEnv);
   return (
     <BottomSheetModalProvider>
       <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>

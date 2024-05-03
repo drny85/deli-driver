@@ -4,17 +4,16 @@ import { Colors } from './Colors';
 export const StackScreenWithSearchBar: NativeStackNavigationOptions = {
   headerLargeTitle: true,
   headerLargeStyle: {
-    backgroundColor: Colors.main,
+    backgroundColor: Colors.primary,
   },
   headerLargeTitleStyle: {
-    color: Colors.white,
+    color: Colors.main,
   },
 
   headerSearchBarOptions: {
     hintTextColor: Colors.secondary,
-    tintColor: Colors.white,
+    tintColor: Colors.main,
     barTintColor: Colors.main,
-    textColor: 'red',
   },
 
   headerTintColor: Colors.main,
