@@ -1,26 +1,43 @@
-import { useEffect, useState } from 'react';
-
+import { useLocatioStore } from '@/providers/locationStore';
+import { distanceBetweenCoords } from '@/utils/distanceBetweenCoords';
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
+import { useEffect, useState } from 'react';
 const LOCATION_TASK_NAME = 'background-location-task';
 
 var l1;
 var l2;
 
-export const useBackgroundLocation = (interval: number = 10) => {
+export const useBackgroundLocation = () => {
   const [locationStarted, setLocationStarted] = useState(false);
-  const [locationGranted, setLocationGranted] = useState(false);
+  const [clicked, setClicked] = useState(0);
+  const [foregroundPermission, setForegroundPermission] = useState<Location.PermissionResponse>();
+  const [backgroundPermission, setBackgroundPermission] = useState<Location.PermissionResponse>();
+  const setCurrent = useLocatioStore((s) => s.setLocation);
 
-  const startLocationTracking = async (interval: number) => {
+  const startLocationTracking = async () => {
     try {
       const initiated = await TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME);
       if (initiated) {
         await TaskManager.unregisterTaskAsync(LOCATION_TASK_NAME);
       }
+      const available = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
+      if (available) {
+        await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+      }
+
+      const currentLocation = await getForgroundLocation();
+      setCurrent(currentLocation.coords);
+
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-        accuracy: Location.Accuracy.BestForNavigation,
+        accuracy: Location.Accuracy.Highest,
         timeInterval: 5000,
-        distanceInterval: interval,
+        distanceInterval: 20,
+        activityType: Location.ActivityType.AutomotiveNavigation,
+        deferredUpdatesInterval: 5000,
+        deferredUpdatesDistance: 20,
+        showsBackgroundLocationIndicator: true,
+        pausesUpdatesAutomatically: true,
       });
 
       const hasStarted = await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK_NAME);
@@ -43,6 +60,7 @@ export const useBackgroundLocation = (interval: number = 10) => {
     TaskManager.isTaskRegisteredAsync(LOCATION_TASK_NAME).then((tracking) => {
       if (tracking) {
         Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+        console.log('tracking stopped');
       }
     });
   };
@@ -51,44 +69,58 @@ export const useBackgroundLocation = (interval: number = 10) => {
     try {
       let resf = await Location.requestForegroundPermissionsAsync();
       let resb = await Location.requestBackgroundPermissionsAsync();
-      if (resf.status != 'granted' && resb.status !== 'granted') {
+      console.log(resf.status, resb.status);
+      if (resf.status != 'granted' || resb.status !== 'granted') {
         console.log('Permission to access location was denied');
-        setLocationGranted(false);
+
+        setForegroundPermission(resf);
+        setClicked((prev) => prev + 1);
         return false;
       } else {
-        console.log('Permission to access location granted');
+        console.log('Permission to access location granted', resb.status);
+        setBackgroundPermission(resb);
 
-        setLocationGranted(true);
         return true;
       }
     } catch (error) {
       console.log(error);
-      setLocationGranted(false);
+
       return false;
     }
   };
+
   useEffect(() => {
     config();
-  }, [interval]);
+  }, []);
 
   return {
-    locationStarted,
     stopLocation,
     startLocationTracking,
-    locationGranted,
     getForgroundLocation,
+    foregroundPermission,
+    backgroundPermission,
+    clicked,
+    setClicked,
+    config,
   };
 };
 
-TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error, executionInfo }) => {
   if (error) {
     console.log('LOCATION_TRACKING task ERROR:', error);
     return;
   }
+
   if (data) {
     const { locations } = data as any;
     let lat = locations[0].coords.latitude;
     let long = locations[0].coords.longitude;
+    const location = useLocatioStore.getState().getLocation();
+    const diff = distanceBetweenCoords(location, { latitude: lat, longitude: long });
+
+    if (diff < 5) return;
+
+    useLocatioStore.getState().setLocation({ latitude: lat, longitude: long });
 
     l1 = lat;
     l2 = long;

@@ -2,11 +2,11 @@ import { Stack } from 'expo-router';
 
 import { Fonts } from '@/constants/fonts';
 import { AuthProvider } from '@/providers/authProvider';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
@@ -44,6 +44,7 @@ function RootLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="(maps)" options={{ headerShown: false }} />
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      <Stack.Screen name="notlocation" options={{ headerShown: false }} />
       {/* <Stack.Screen
         name="quiz"
         options={{

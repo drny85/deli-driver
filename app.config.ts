@@ -22,6 +22,12 @@ const config: ExpoConfig = {
       'expo-location',
       {
         locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
+
+        locationAlwaysPermission: 'Allow $(PRODUCT_NAME) to use your location.',
+        locationWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
+        NSLocationUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
+        isIosBackgroundLocationEnabled: true,
+        isAndroidBackgroundLocationEnabled: true,
       },
     ],
   ],
@@ -46,7 +52,11 @@ const config: ExpoConfig = {
     supportsTablet: false,
     bundleIdentifier: 'com.robertdev.deli.driver',
     infoPlist: {
-      UIBackgroundModes: ['location', 'fetch', 'remote-notification'],
+      UIBackgroundModes: ['location', 'fetch', 'remote-notification', 'audio'],
+      NSLocationWhenInUseUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
+      NSLocationAlwaysAndWhenInUseUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
+      NSLocationAlwaysUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
+      NSLocationUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
     },
   },
   android: {
