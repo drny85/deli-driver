@@ -216,7 +216,7 @@ const Maps = () => {
           )}
           {origin && order && order.destination && restaurant && (
             <MapViewDirections
-              apikey={'AIzaSyAlCsbcHrd8t87qDnUVzWQEqQYDmuDVmDM'}
+              apikey={}
               origin={origin}
               destination={order.destination}
               strokeWidth={3}
