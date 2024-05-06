@@ -7,10 +7,11 @@ import { findUndeliveredOrder } from '@/utils/getNextClosestOrder';
 import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { SIZES } from '@/constants/Colors';
+import { ORDER_STATUS } from '@/typing';
 
 const NextOrder = () => {
   const orders = useOrdersStore((s) => s.orders);
-  const moreOrders = orders.filter((order) => order.status === 'Accepted By Courier');
+  const moreOrders = orders.filter((order) => order.status === ORDER_STATUS.accepted_by_driver);
 
   const handleNextOrder = useCallback(async () => {
     if (moreOrders.length === 0) return;

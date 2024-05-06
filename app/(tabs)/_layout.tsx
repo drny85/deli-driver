@@ -1,8 +1,14 @@
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { TabBarIcon } from '../../components/TabBarIcon';
+import { useAuth } from '@/providers/authProvider';
 
 export default function TabLayout() {
+  const { user, signOut } = useAuth();
+
+  if (user === null) {
+    return <Redirect href={'/(auth)/login'} />;
+  }
   return (
     <Tabs
       screenOptions={{
@@ -28,6 +34,14 @@ export default function TabLayout() {
         name="(delivery)"
         options={{
           title: 'Deliveries',
+          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="(restaurants)"
+        options={{
+          title: 'Restaurants',
+          headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />

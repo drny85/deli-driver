@@ -2,11 +2,10 @@ import { Container } from '@/components/Container';
 import NeoView from '@/components/NeoView';
 import NotLocationGranted from '@/components/NotLocationGranted';
 import { Colors, SIZES } from '@/constants/Colors';
-import { ordersData } from '@/constants/ordersData';
 import { useBackgroundLocation } from '@/hooks/useLocation';
+import { useOrders } from '@/hooks/useOrders';
 import { useOrdersStore } from '@/providers/ordersStore';
-import { TempOrder } from '@/typing';
-import { sortOrderByDistance } from '@/utils/sortOrdersByDistance';
+import { Order, ORDER_STATUS } from '@/typing';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -24,51 +23,52 @@ const Home = () => {
     foregroundPermission,
   } = useBackgroundLocation();
 
-  const { setOrders, orders } = useOrdersStore();
+  const { orders } = useOrders();
 
   const [option, setOption] = useState(0);
 
   const ordersToRender = useMemo(() => {
-    if (option === 0) return orders.filter((o) => o.status === 'Ready For Delivery');
-    if (option === 1) return orders.filter((o) => o.status === 'Accepted By Courier');
-    if (option === 2) return orders.filter((o) => o.status === 'Picked By Courier');
+    if (option === 0)
+      return orders.filter((o) => o.status === ORDER_STATUS.marked_ready_for_delivery);
+    if (option === 1) return orders.filter((o) => o.status === ORDER_STATUS.accepted_by_driver);
+    if (option === 2) return orders.filter((o) => o.status === ORDER_STATUS.picked_up_by_driver);
     return orders;
   }, [option, orders]);
 
   // console.log(JSON.stringify(ordersToRender, null, 2));
 
-  const renderOrders: ListRenderItem<TempOrder> = ({ item }) => {
-    const disabled = orders.some((o) => o.status === 'Picked By Courier');
+  const renderOrders: ListRenderItem<Order> = ({ item }) => {
+    const disabled = orders.some((o) => o.status === ORDER_STATUS.picked_up_by_driver);
 
     return (
       <TouchableOpacity
         onPress={() => {
-          if (disabled && item.status !== 'Picked By Courier') {
+          if (disabled && item.status !== ORDER_STATUS.picked_up_by_driver) {
             Alert.alert('Current Order', 'You must deliver the current order first', [
               { onPress: () => setOption(2) },
             ]);
             return;
           }
-          router.push({ pathname: '/(maps)/maps', params: { orderId: item.id } });
+          router.push({ pathname: '/(maps)/maps', params: { orderId: item.id! } });
         }}>
         <NeoView
           containerStyle={{
             padding: SIZES.md,
             borderRadius: SIZES.sm,
-            backgroundColor: item.status === 'Picked By Courier' ? Colors.accent : Colors.primary,
+            backgroundColor:
+              item.status === ORDER_STATUS.picked_up_by_driver ? Colors.accent : Colors.primary,
           }}>
           <Text>{item.status}</Text>
-          {item.distance && <Text>{item.distance} km</Text>}
         </NeoView>
       </TouchableOpacity>
     );
   };
 
   useEffect(() => {
-    const gt = async () => {
-      const or = await sortOrderByDistance(ordersData);
-      setOrders(or);
-    };
+    // const gt = async () => {
+    //   const or = await sortOrderByDistance(ordersData);
+    //   setOrders(or);
+    // };
     // gt();
     // startLocationTracking();
   }, []);

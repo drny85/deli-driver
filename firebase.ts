@@ -5,6 +5,7 @@ import { getReactNativePersistence, initializeAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { CollectionReference, DocumentData, collection, getFirestore } from 'firebase/firestore';
 import Constants from 'expo-constants';
+import { Business, Order } from './typing';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -17,20 +18,18 @@ import Constants from 'expo-constants';
 console.log(
   'firebase',
   process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
   Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_API_KEY
 );
 const firebaseConfig = {
-  apiKey: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  authDomain: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_PROJECT_ID,
-  storageBucket: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-  measurementId: Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
-
-console.log('firebaseConfig', JSON.stringify(Constants.expoConfig?.extra?.env, null, 2));
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = initializeAuth(app, {
@@ -44,6 +43,11 @@ const storage = getStorage(app);
 const createCollection = <T = DocumentData>(collectionName: string) => {
   return collection(db, collectionName) as CollectionReference<T>;
 };
+
+export const businessCollection = createCollection<Business>('business');
+export const ordersCollection = createCollection<Order>('orders');
+
+console.log(app);
 
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase

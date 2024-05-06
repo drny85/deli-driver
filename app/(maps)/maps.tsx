@@ -4,7 +4,7 @@ import MapHeader from '@/components/map/MapHeader';
 import { Colors, SIZES } from '@/constants/Colors';
 import { useLocatioStore } from '@/providers/locationStore';
 import { useOrdersStore } from '@/providers/ordersStore';
-import { Coords, TempOrder } from '@/typing';
+import { Coords, Order, ORDER_STATUS, TempOrder } from '@/typing';
 import { actionTitle } from '@/utils/actionTitle';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -15,6 +15,8 @@ import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-dire
 import openMap from 'react-native-open-maps';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import Constants from 'expo-constants';
+import { useBusiness } from '@/hooks/useBusiness';
+import Loading from '@/components/Loading';
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || '';
 
@@ -30,13 +32,14 @@ const Maps = () => {
   const mapViewRef = useRef<MapView>(null);
 
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
-  const location = useLocatioStore((s) => s.location);
+  const location = useLocatioStore((state) => state.location);
+  const { getOrder, setOrders, orders, updateOrder } = useOrdersStore();
+  const order = getOrder(orderId);
+  const { business, loading } = useBusiness(order.businessId);
 
-  const { getOrder, setOrders, orders } = useOrdersStore();
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
   const height = useSharedValue(0.25);
-  const order = getOrder(orderId);
 
   const [initialRegion, setInitialRegion] = useState<Region>({
     latitude: 40.8306,
@@ -60,37 +63,27 @@ const Maps = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const waypoints = useMemo(
     () =>
-      origin && restaurant && order?.status === 'Ready For Delivery' ? [origin, restaurant] : [],
-    [origin, restaurant, order.status]
+      origin && business?.coords && order?.status === ORDER_STATUS.marked_ready_for_delivery
+        ? [origin, business.coords]
+        : [],
+    [origin, business, order.status]
   );
 
-  const onActionPress = () => {
-    if (order?.status === 'Ready For Delivery') {
-      const updatedOrder: TempOrder = { ...order, status: 'Accepted By Courier' };
+  const onActionPress = async () => {
+    if (order?.status === ORDER_STATUS.marked_ready_for_delivery) {
+      const updatedOrder: Order = { ...order, status: ORDER_STATUS.accepted_by_driver };
 
-      setOrders([
-        ...orders.map((o) => {
-          if (o.id === orderId) {
-            return updatedOrder;
-          }
-          return o;
-        }),
-      ]);
+      updateOrder(updatedOrder);
+
       router.back();
       return;
-    } else if (order?.status === 'Accepted By Courier') {
-      const updatedNewOrder: TempOrder = { ...order, status: 'Picked By Courier' };
-      setOrders([
-        ...orders.map((o) => {
-          if (o.id === orderId) {
-            return updatedNewOrder;
-          }
-          return o;
-        }),
-      ]);
-      openGoogleMap(order.destination);
-    } else if (order?.status === 'Picked By Courier') {
-      const updatedNewOrder: TempOrder = { ...order, status: 'Delivered' };
+    } else if (order?.status === ORDER_STATUS.accepted_by_driver) {
+      const updatedNewOrder: Order = { ...order, status: ORDER_STATUS.picked_up_by_driver };
+      updateOrder(updatedNewOrder);
+
+      openGoogleMap();
+    } else if (order?.status === ORDER_STATUS.picked_up_by_driver) {
+      const updatedNewOrder: Order = { ...order, status: ORDER_STATUS.delivered };
       setOrders([
         ...orders.map((o) => {
           if (o.id === orderId) {
@@ -106,11 +99,23 @@ const Maps = () => {
   // const order = useMemo(() => findUndeliveredOrder(orders, origin!), [orders]);
   // console.log(order);
 
-  const openGoogleMap = useCallback(async (route: { latitude: number; longitude: number }) => {
+  const openGoogleMap = useCallback(async () => {
     try {
-      const endRoute = '1450 clay ave, bronx ny 10456';
+      const route =
+        order.status === ORDER_STATUS.accepted_by_driver
+          ? business?.coords
+          : order.status === ORDER_STATUS.picked_up_by_driver
+            ? order.address?.coords
+            : null;
+      const endRoute =
+        order.status === ORDER_STATUS.accepted_by_driver
+          ? business?.address
+          : order.status === ORDER_STATUS.picked_up_by_driver
+            ? order.address?.street
+            : '';
 
       // @ts-ignore
+      console.log(route, endRoute);
       openMap({
         ...route,
         provider: 'google',
@@ -136,7 +141,7 @@ const Maps = () => {
   useEffect(() => {
     if (!origin || !order) return;
     // startLocationTracking();
-    if (order.status === 'Ready For Delivery') {
+    if (order.status === ORDER_STATUS.marked_ready_for_delivery) {
       mapViewRef.current?.fitToSuppliedMarkers(['origin', 'destination', 'restaurant'], {
         edgePadding: {
           top: 20,
@@ -153,13 +158,13 @@ const Maps = () => {
       }, 1500);
       timeOut = setTimeout(() => {
         mapViewRef.current?.animateToRegion({
-          ...restaurant!,
+          ...business?.coords!,
           ...DELTA,
         });
       }, 3500);
       timeOut = setTimeout(() => {
         mapViewRef.current?.animateToRegion({
-          ...order.destination!,
+          ...order.address?.coords!,
           ...DELTA,
         });
       }, 5500);
@@ -175,15 +180,15 @@ const Maps = () => {
       }, 7000);
     }
 
-    if (order.status === 'Picked By Courier') {
+    if (order.status === ORDER_STATUS.picked_up_by_driver) {
       mapViewRef.current?.fitToSuppliedMarkers(['origin', 'destination']);
     }
-    if (order.status === 'Accepted By Courier') {
+    if (order.status === ORDER_STATUS.accepted_by_driver) {
       mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant']);
     }
 
     return () => timeOut && clearTimeout(timeOut);
-  }, [location, order, restaurant]);
+  }, [location, order, business?.coords]);
 
   useEffect(() => {
     if (!order) {
@@ -192,6 +197,8 @@ const Maps = () => {
   }, [order]);
 
   if (!API_KEY) return;
+
+  if (loading) return <Loading />;
   return (
     <View style={styles.container}>
       <MapHeader
@@ -206,10 +213,10 @@ const Maps = () => {
           });
         }}
         onPress={() => {
-          openGoogleMap({ ...origin! });
+          openGoogleMap();
         }}
       />
-      {origin && order && (
+      {origin && order.address?.coords && business?.coords && (
         <AnimatedMap
           style={[styles.map, animatedHeight]}
           mapPadding={{
@@ -226,27 +233,40 @@ const Maps = () => {
           region={initialRegion}
           showsUserLocation
           followsUserLocation
+          // onUserLocationChange={({ nativeEvent: { coordinate } }) => {
+          //   console.log(coordinate);
+          //   if (coordinate) {
+          //     setInitialRegion({
+          //       latitude: coordinate?.latitude,
+          //       longitude: coordinate?.longitude,
+          //       ...DELTA,
+          //     });
+          //     setUserLocation({ latitude: coordinate?.latitude, longitude: coordinate?.longitude });
+          //   }
+          // }}
           zoomTapEnabled
           showsPointsOfInterest={false}
           showsBuildings={false}>
           {origin && <Marker coordinate={origin} title="Me" identifier="origin" />}
-          {restaurant &&
-            (order.status === 'Ready For Delivery' || order.status === 'Accepted By Courier') && (
-              <Marker coordinate={restaurant} title="Restaurant" identifier="restaurant" />
+          {business &&
+            (order.status === ORDER_STATUS.marked_ready_for_delivery ||
+              order.status === ORDER_STATUS.accepted_by_driver) && (
+              <Marker coordinate={business.coords!} title={business.name} identifier="restaurant" />
             )}
-          {order && order.destination && (
-            <Marker coordinate={order.destination} title="Customer" identifier="destination" />
+          {order && order.address?.coords && (
+            <Marker coordinate={order.address.coords} title="Customer" identifier="destination" />
           )}
-          {origin && order && order.destination && restaurant && (
+
+          {origin && order && order.address.coords && restaurant && (
             <MapViewDirections
               apikey={API_KEY}
               origin={origin}
               destination={
-                order.status === 'Ready For Delivery'
-                  ? order.destination
-                  : order.status === 'Accepted By Courier'
-                    ? restaurant
-                    : order.destination
+                order.status === ORDER_STATUS.marked_ready_for_delivery
+                  ? order.address.coords
+                  : order.status === ORDER_STATUS.accepted_by_driver
+                    ? business?.coords
+                    : order.address.coords
               }
               strokeWidth={3}
               strokeColor={Colors.main}

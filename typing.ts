@@ -14,6 +14,19 @@ export type OrderStatus =
   | 'Accepted By Courier'
   | 'Delivered';
 
+export enum ORDER_STATUS {
+  new = 'new',
+  delivered = 'delivered',
+  in_progress = 'in_progress',
+  marked_ready_for_delivery = 'marked_ready_for_delivery',
+  marked_ready_for_pickup = 'marked_ready_for_pickup',
+  cancelled = 'cancelled',
+  accepted_by_driver = 'accepted_by_driver',
+  picked_up_by_driver = 'picked_up_by_driver',
+  picked_up_by_client = 'picked_up_by_client',
+  all = 'all orders',
+}
+
 export const statusList: OrderStatus[] = [
   'Order Received',
   'Processing',
@@ -36,7 +49,7 @@ export interface Order {
   orderType: ORDER_TYPE;
   deliveryInstructions: string | null;
   address: OrderAddress | null;
-  status: OrderStatus;
+  status: ORDER_STATUS;
   courier?: Courier | null;
   deliveredOn?: string | null;
   deliveredBy: Courier | null;
@@ -49,6 +62,7 @@ export interface Order {
   deliveryPaid: boolean;
   transferId: string | null;
   otpPickup?: number | null;
+  distance?: number;
 }
 export type TempOrder = {
   id: string;
@@ -108,4 +122,48 @@ export interface AppUser {
   deliveryAddresses: string | [];
   provider: 'email' | 'apple' | 'google';
   createdAt: string;
+}
+
+export interface Business {
+  id?: string;
+  name: string;
+  email: string;
+  mode: 'live' | 'test';
+  owner: { name: string; lastName: string };
+  stripeAccount: string | null;
+  address: string | null;
+  coords: Coords | null;
+  phone: string | null;
+  isActive: boolean;
+  userId: string;
+  tempStripeAccount?: string;
+  profileCompleted: boolean;
+  hasItems: boolean;
+  image: string | null;
+  hours: BusinessDay | null;
+  charges_enabled: boolean;
+  minimumDelivery: number | null;
+  orderType?: BUSINESS_ORDER_TYPE;
+  isOpen: boolean;
+  distance?: number | null;
+  eta?: number;
+  zips: number[];
+  lastClosed?: string;
+  lastOpened?: string;
+  createdAt: string;
+  requiredOTPForPickup?: boolean;
+  couriers: string[];
+}
+
+export interface BusinessDay {
+  [key: string]: Day;
+}
+
+interface Day {
+  openAt: string;
+  closeAt: string;
+}
+export enum BUSINESS_ORDER_TYPE {
+  deliveryOnly = 'deliveryOnly',
+  both = 'both',
 }

@@ -1,16 +1,13 @@
-import { Coords, TempOrder } from '@/typing';
+import { Coords, Order, ORDER_STATUS, TempOrder } from '@/typing';
 import { calculateDistance } from './calculateDistance';
 
-export function findUndeliveredOrder(
-  orders: TempOrder[],
-  currentLocation: Coords
-): TempOrder | null {
-  let closestUndeliveredOrder: TempOrder | null = null;
+export function findUndeliveredOrder(orders: Order[], currentLocation: Coords): TempOrder | null {
+  let closestUndeliveredOrder: Order | null = null;
   let closestDistance = Infinity;
 
   orders.forEach((order) => {
-    if (order.status !== 'Delivered') {
-      const distance = calculateDistance(currentLocation, order.destination);
+    if (order.status !== ORDER_STATUS.delivered) {
+      const distance = calculateDistance(currentLocation, order.address?.coords!);
       if (distance < closestDistance) {
         closestDistance = distance;
         closestUndeliveredOrder = { ...order, distance };

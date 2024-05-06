@@ -1,11 +1,11 @@
-import { OrderStatus } from '@/typing';
+import { ORDER_STATUS } from '@/typing';
 
-export const actionTitle = (status: OrderStatus): string => {
-  return status === 'Ready For Delivery'
+export const actionTitle = (status: ORDER_STATUS): string => {
+  return status === ORDER_STATUS.marked_ready_for_delivery
     ? 'Add To Trip'
-    : status === 'Accepted By Courier'
+    : status === ORDER_STATUS.accepted_by_driver
       ? 'Pick Up Order'
-      : status === 'Picked By Courier'
+      : status === ORDER_STATUS.picked_up_by_driver
         ? 'Deliver Order'
         : 'Complete';
 };
