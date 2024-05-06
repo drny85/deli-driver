@@ -1,5 +1,9 @@
 import { ExpoConfig } from 'expo/config';
 
+const filteredEnv = Object.fromEntries(
+  Object.entries(process.env).filter(([key, val]) => key.indexOf('EXPO_PUBLIC_') === 0)
+);
+
 // In SDK 46 and lower, use the following import instead:
 // import { ExpoConfig } from '@expo/config-types';
 
@@ -64,6 +68,9 @@ const config: ExpoConfig = {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
+  },
+  extra: {
+    env: filteredEnv,
   },
 };
 

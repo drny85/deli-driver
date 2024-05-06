@@ -6,12 +6,11 @@ import { ordersData } from '@/constants/ordersData';
 import { useBackgroundLocation } from '@/hooks/useLocation';
 import { useOrdersStore } from '@/providers/ordersStore';
 import { TempOrder } from '@/typing';
-import { metersToMiles } from '@/utils/metersToMiles';
 import { sortOrderByDistance } from '@/utils/sortOrdersByDistance';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
-import { FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
 
 const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current'];
 
@@ -43,8 +42,13 @@ const Home = () => {
 
     return (
       <TouchableOpacity
-        disabled={disabled && item.status !== 'Picked By Courier'}
         onPress={() => {
+          if (disabled && item.status !== 'Picked By Courier') {
+            Alert.alert('Current Order', 'You must deliver the current order first', [
+              { onPress: () => setOption(2) },
+            ]);
+            return;
+          }
           router.push({ pathname: '/(maps)/maps', params: { orderId: item.id } });
         }}>
         <NeoView
@@ -65,8 +69,8 @@ const Home = () => {
       const or = await sortOrderByDistance(ordersData);
       setOrders(or);
     };
-    gt();
-    startLocationTracking();
+    // gt();
+    // startLocationTracking();
   }, []);
 
   if (!backgroundPermission) {
@@ -92,7 +96,7 @@ const Home = () => {
           onChange={(event) => {
             setOption(event.nativeEvent.selectedSegmentIndex);
           }}
-          selectedIndex={0}
+          selectedIndex={option}
           tintColor={Colors.main}
           activeFontStyle={{ color: '#ffffff', fontWeight: '700' }}
           style={{ marginBottom: SIZES.md, height: 40 }}
@@ -101,6 +105,11 @@ const Home = () => {
           scrollEnabled={false}
           data={ordersToRender}
           renderItem={renderOrders}
+          ListEmptyComponent={() => (
+            <View style={{ marginTop: 60 }}>
+              <Text style={{ textAlign: 'center', fontSize: 22 }}>No orders</Text>
+            </View>
+          )}
           contentContainerStyle={{ gap: SIZES.md }}
         />
       </View>

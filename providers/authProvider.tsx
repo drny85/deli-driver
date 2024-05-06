@@ -1,3 +1,5 @@
+import { auth } from '@/firebase';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react';
 
 // Define custom user type
@@ -5,6 +7,7 @@ interface CustomUser {
   id: string;
   email: string;
   displayName?: string | null;
+  isEmailVerified: boolean;
 }
 
 // Define types for AuthContext
@@ -32,28 +35,26 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<CustomUser | null>(null);
 
-  //   useEffect(() => {
-  //     const unsubscribe = auth().onAuthStateChanged(newUser => {
-  //       if (newUser) {
-  //         setUser({
-  //           id: newUser.uid,
-  //           email: newUser.email || '',
-  //           displayName: newUser.displayName,
-  //         });
-  //         setIsEmailVerified(newUser.emailVerified);
-  //       } else {
-  //         setUser(null);
-  //         setIsEmailVerified(false);
-  //       }
-  //     });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (newUser) => {
+      if (newUser) {
+        setUser({
+          id: newUser.uid,
+          email: newUser.email || '',
+          displayName: newUser.displayName,
+          isEmailVerified: newUser.emailVerified,
+        });
+      } else {
+        setUser(null);
+      }
+    });
 
-  // return () => unsubscribe();
-  //   }, []);
+    return () => unsubscribe();
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
-      //   await auth().signInWithEmailAndPassword(email, password);
-      setUser({ id: '123', email: email });
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;

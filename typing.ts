@@ -13,6 +13,7 @@ export type OrderStatus =
   | 'Picked By Courier'
   | 'Accepted By Courier'
   | 'Delivered';
+
 export const statusList: OrderStatus[] = [
   'Order Received',
   'Processing',

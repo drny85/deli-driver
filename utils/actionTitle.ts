@@ -2,7 +2,7 @@ import { OrderStatus } from '@/typing';
 
 export const actionTitle = (status: OrderStatus): string => {
   return status === 'Ready For Delivery'
-    ? 'Accept Order'
+    ? 'Add To Trip'
     : status === 'Accepted By Courier'
       ? 'Pick Up Order'
       : status === 'Picked By Courier'

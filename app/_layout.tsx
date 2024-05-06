@@ -14,23 +14,20 @@ export const unstable_settings = {
   initialRouteName: '(tabs)',
 };
 export default function App() {
-  const [fontsLoaded] = useFonts(Fonts);
+  const [fontsLoaded, error] = useFonts(Fonts);
+
+  console.log('FONTS', fontsLoaded, error);
 
   const onLayout = useCallback(async () => {
-    if (fontsLoaded) {
+    if (fontsLoaded && !error) {
       await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, error]);
 
   if (!fontsLoaded) {
     return null;
   }
 
-  const filteredEnv = Object.fromEntries(
-    Object.entries(process.env).filter(([key, val]) => key.indexOf('EXPO_PUBLIC_') === 0)
-  );
-
-  console.log(filteredEnv);
   return (
     <BottomSheetModalProvider>
       <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>

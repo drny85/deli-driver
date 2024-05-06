@@ -14,6 +14,9 @@ import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-directions';
 import openMap from 'react-native-open-maps';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Constants from 'expo-constants';
+
+const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || '';
 
 const AnimatedMap = Animated.createAnimatedComponent(MapView);
 const DELTA = {
@@ -28,7 +31,7 @@ const Maps = () => {
 
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const location = useLocatioStore((s) => s.location);
-  console.log(location);
+
   const { getOrder, setOrders, orders } = useOrdersStore();
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
@@ -56,14 +59,15 @@ const Maps = () => {
   const snapshots = useMemo(() => ['25%', '50%', '80%'], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const waypoints = useMemo(
-    () => (origin && restaurant ? [origin, restaurant] : []),
-    [origin, restaurant]
+    () =>
+      origin && restaurant && order?.status === 'Ready For Delivery' ? [origin, restaurant] : [],
+    [origin, restaurant, order.status]
   );
 
   const onActionPress = () => {
     if (order?.status === 'Ready For Delivery') {
       const updatedOrder: TempOrder = { ...order, status: 'Accepted By Courier' };
-      console.log(updatedOrder);
+
       setOrders([
         ...orders.map((o) => {
           if (o.id === orderId) {
@@ -72,6 +76,8 @@ const Maps = () => {
           return o;
         }),
       ]);
+      router.back();
+      return;
     } else if (order?.status === 'Accepted By Courier') {
       const updatedNewOrder: TempOrder = { ...order, status: 'Picked By Courier' };
       setOrders([
@@ -83,6 +89,17 @@ const Maps = () => {
         }),
       ]);
       openGoogleMap(order.destination);
+    } else if (order?.status === 'Picked By Courier') {
+      const updatedNewOrder: TempOrder = { ...order, status: 'Delivered' };
+      setOrders([
+        ...orders.map((o) => {
+          if (o.id === orderId) {
+            return updatedNewOrder;
+          }
+          return o;
+        }),
+      ]);
+      router.push('/(maps)/nextOrder');
     }
   };
 
@@ -161,6 +178,9 @@ const Maps = () => {
     if (order.status === 'Picked By Courier') {
       mapViewRef.current?.fitToSuppliedMarkers(['origin', 'destination']);
     }
+    if (order.status === 'Accepted By Courier') {
+      mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant']);
+    }
 
     return () => timeOut && clearTimeout(timeOut);
   }, [location, order, restaurant]);
@@ -170,6 +190,8 @@ const Maps = () => {
       router.back();
     }
   }, [order]);
+
+  if (!API_KEY) return;
   return (
     <View style={styles.container}>
       <MapHeader
@@ -208,17 +230,24 @@ const Maps = () => {
           showsPointsOfInterest={false}
           showsBuildings={false}>
           {origin && <Marker coordinate={origin} title="Me" identifier="origin" />}
-          {restaurant && (
-            <Marker coordinate={restaurant} title="Restaurant" identifier="restaurant" />
-          )}
+          {restaurant &&
+            (order.status === 'Ready For Delivery' || order.status === 'Accepted By Courier') && (
+              <Marker coordinate={restaurant} title="Restaurant" identifier="restaurant" />
+            )}
           {order && order.destination && (
             <Marker coordinate={order.destination} title="Customer" identifier="destination" />
           )}
           {origin && order && order.destination && restaurant && (
             <MapViewDirections
-              apikey={}
+              apikey={API_KEY}
               origin={origin}
-              destination={order.destination}
+              destination={
+                order.status === 'Ready For Delivery'
+                  ? order.destination
+                  : order.status === 'Accepted By Courier'
+                    ? restaurant
+                    : order.destination
+              }
               strokeWidth={3}
               strokeColor={Colors.main}
               onStart={(params) => {
@@ -256,6 +285,7 @@ const Maps = () => {
           <View style={{ width: '60%', alignSelf: 'center', marginBottom: SIZES.lg }}>
             <Button title={actionTitle(order.status)} onPress={onActionPress} />
           </View>
+
           <View
             style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
             <ETA title={distance.toFixed(2)} subtitle="miles" />

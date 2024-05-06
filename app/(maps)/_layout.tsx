@@ -6,6 +6,7 @@ const MapsLayout = () => {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="maps" />
+      <Stack.Screen name="nextOrder" />
     </Stack>
   );
 };
