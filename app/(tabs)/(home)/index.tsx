@@ -1,11 +1,14 @@
 import { Container } from '@/components/Container';
 import NeoView from '@/components/NeoView';
 import NotLocationGranted from '@/components/NotLocationGranted';
+import Row from '@/components/Row';
 import { Colors, SIZES } from '@/constants/Colors';
 import { useBackgroundLocation } from '@/hooks/useLocation';
 import { useOrders } from '@/hooks/useOrders';
 import { useOrdersStore } from '@/providers/ordersStore';
 import { Order, ORDER_STATUS } from '@/typing';
+import { dayjsFormat } from '@/utils/dayjs';
+import { FontAwesome } from '@expo/vector-icons';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { router } from 'expo-router';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -15,8 +18,6 @@ const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current'];
 
 const Home = () => {
   const {
-    stopLocation,
-    startLocationTracking,
     config,
 
     backgroundPermission,
@@ -53,12 +54,23 @@ const Home = () => {
         }}>
         <NeoView
           containerStyle={{
-            padding: SIZES.md,
+            padding: SIZES.sm,
             borderRadius: SIZES.sm,
             backgroundColor:
               item.status === ORDER_STATUS.picked_up_by_driver ? Colors.accent : Colors.primary,
           }}>
-          <Text>{item.status}</Text>
+          <Row align="between">
+            <View style={{ gap: SIZES.sm }}>
+              <Row align="between">
+                <Text style={{ fontSize: 24, fontFamily: 'Genos-Bold' }}>
+                  Order # {item.orderNumber}
+                </Text>
+                <Text>{dayjsFormat(item.orderDate).format('lll')}</Text>
+              </Row>
+              <Text>{item.address?.street.slice(0, -7)}</Text>
+            </View>
+            <FontAwesome name="chevron-right" size={22} color={Colors.main} />
+          </Row>
         </NeoView>
       </TouchableOpacity>
     );

@@ -15,12 +15,7 @@ import { Business, Order } from './typing';
 // import {...} from "firebase/storage";
 
 // Initialize Firebase
-console.log(
-  'firebase',
-  process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
-  process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
-  Constants.expoConfig?.extra?.env.EXPO_PUBLIC_FIREBASE_API_KEY
-);
+
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -46,8 +41,6 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 
 export const businessCollection = createCollection<Business>('business');
 export const ordersCollection = createCollection<Order>('orders');
-
-console.log(app);
 
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase

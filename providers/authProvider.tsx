@@ -1,5 +1,11 @@
 import { auth } from '@/firebase';
-import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  sendEmailVerification,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth';
 import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react';
 
 // Define custom user type
@@ -15,7 +21,7 @@ interface AuthContextType {
   user: CustomUser | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  logOut: () => Promise<void>;
   resetPasswordEmail: (email: string) => Promise<void>;
 }
 
@@ -63,16 +69,17 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   const signUp = async (email: string, password: string) => {
     try {
-      //   await auth().createUserWithEmailAndPassword(email, password);
+      const { user } = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(user);
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
     }
   };
 
-  const signOut = async () => {
+  const logOut = async () => {
     try {
-      //   await auth().signOut();
+      await signOut(auth);
       setUser(null);
     } catch (error) {
       console.error('Sign out error:', error);
@@ -93,7 +100,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     user,
     signIn,
     signUp,
-    signOut,
+    logOut,
     resetPasswordEmail,
   };
 

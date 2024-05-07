@@ -4,7 +4,7 @@ import { TabBarIcon } from '../../components/TabBarIcon';
 import { useAuth } from '@/providers/authProvider';
 
 export default function TabLayout() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
   if (user === null) {
     return <Redirect href={'/(auth)/login'} />;
@@ -43,6 +43,14 @@ export default function TabLayout() {
           title: 'Restaurants',
           headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="(settings)"
+        options={{
+          title: 'Settings',
+          headerShown: false,
+          tabBarIcon: ({ color }) => <TabBarIcon name="gears" color={color} />,
         }}
       />
     </Tabs>

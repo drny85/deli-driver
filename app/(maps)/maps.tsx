@@ -1,12 +1,19 @@
 import { Button } from '@/components/Button';
+import Divider from '@/components/Divider';
+import Loading from '@/components/Loading';
 import ETA from '@/components/map/ETA';
 import MapHeader from '@/components/map/MapHeader';
+import MapOrderDetails from '@/components/map/MapOrderDetails';
+import Row from '@/components/Row';
 import { Colors, SIZES } from '@/constants/Colors';
+import { useBusiness } from '@/hooks/useBusiness';
+import { useBackgroundLocation } from '@/hooks/useLocation';
 import { useLocatioStore } from '@/providers/locationStore';
 import { useOrdersStore } from '@/providers/ordersStore';
-import { Coords, Order, ORDER_STATUS, TempOrder } from '@/typing';
+import { Coords, Order, ORDER_STATUS } from '@/typing';
 import { actionTitle } from '@/utils/actionTitle';
 import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet';
+import Constants from 'expo-constants';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
@@ -14,9 +21,6 @@ import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-directions';
 import openMap from 'react-native-open-maps';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import Constants from 'expo-constants';
-import { useBusiness } from '@/hooks/useBusiness';
-import Loading from '@/components/Loading';
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || '';
 
@@ -25,12 +29,12 @@ const DELTA = {
   latitudeDelta: 0.02,
   longitudeDelta: 0.02,
 };
-
+let DISTANCE = 0.1;
 let timeOut: NodeJS.Timeout;
 
 const Maps = () => {
   const mapViewRef = useRef<MapView>(null);
-
+  const { startLocationTracking } = useBackgroundLocation();
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const location = useLocatioStore((state) => state.location);
   const { getOrder, setOrders, orders, updateOrder } = useOrdersStore();
@@ -39,7 +43,7 @@ const Maps = () => {
 
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
-  const height = useSharedValue(0.25);
+  const height = useSharedValue(0.2);
 
   const [initialRegion, setInitialRegion] = useState<Region>({
     latitude: 40.8306,
@@ -59,7 +63,7 @@ const Maps = () => {
     longitude: -73.90275,
   });
 
-  const snapshots = useMemo(() => ['25%', '50%', '80%'], []);
+  const snapshots = useMemo(() => ['20%', '55%', '80%'], []);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const waypoints = useMemo(
     () =>
@@ -68,6 +72,18 @@ const Maps = () => {
         : [],
     [origin, business, order.status]
   );
+
+  const onMapChange = (chnages: MapDirectionsResponse) => {
+    const { distance, duration } = chnages;
+    setDistance(distance);
+    setDuration(duration);
+    if (duration < 0.4) {
+      bottomSheetRef.current?.snapToIndex(2);
+    }
+    if (order.status === ORDER_STATUS.picked_up_by_driver) {
+      // DISTANCE = distance;
+    }
+  };
 
   const onActionPress = async () => {
     if (order?.status === ORDER_STATUS.marked_ready_for_delivery) {
@@ -128,12 +144,6 @@ const Maps = () => {
     }
   }, []);
 
-  const onMapChange = (chnages: MapDirectionsResponse) => {
-    const { distance, duration } = chnages;
-    setDistance(distance);
-    setDuration(duration);
-  };
-
   const animatedHeight = useAnimatedStyle(() => ({
     bottom: withTiming(SIZES.height * height.value),
   }));
@@ -177,6 +187,8 @@ const Maps = () => {
             left: 30,
           },
         });
+
+        bottomSheetRef.current?.snapToIndex(2, { duration: 500 });
       }, 7000);
     }
 
@@ -193,6 +205,8 @@ const Maps = () => {
   useEffect(() => {
     if (!order) {
       router.back();
+    } else {
+      startLocationTracking();
     }
   }, [order]);
 
@@ -291,26 +305,31 @@ const Maps = () => {
         backgroundStyle={{ backgroundColor: Colors.white }}
         onChange={(change) => {
           if (change === 1) {
-            height.value = withTiming(0.5);
+            height.value = withTiming(0.55);
           } else if (change === 2) {
-            height.value = withTiming(0.5);
+            height.value = withTiming(0.55);
           } else if (change === 0) {
-            height.value = withTiming(0.25, { duration: 500 });
+            height.value = withTiming(0.2, { duration: 500 });
           }
         }}
         index={0}
         handleIndicatorStyle={{ backgroundColor: Colors.main }}>
         <BottomSheetScrollView
-          contentContainerStyle={{ backgroundColor: Colors.white, padding: SIZES.lg }}>
-          <View style={{ width: '60%', alignSelf: 'center', marginBottom: SIZES.lg }}>
-            <Button title={actionTitle(order.status)} onPress={onActionPress} />
-          </View>
-
-          <View
-            style={{ flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center' }}>
+          contentContainerStyle={{ backgroundColor: Colors.white, padding: SIZES.md }}>
+          <Row align="evenly">
             <ETA title={distance.toFixed(2)} subtitle="miles" />
             <Text style={styles.eta}>ETA {orders.length}</Text>
             <ETA title={duration.toFixed(2)} subtitle="mins" />
+          </Row>
+          <View style={{ marginTop: SIZES.md }}>
+            <Divider small />
+          </View>
+          <View style={{ marginTop: SIZES.lg }}>
+            <MapOrderDetails order={order} business={business!} distance={DISTANCE / distance} />
+          </View>
+
+          <View style={{ width: '60%', alignSelf: 'center', marginVertical: SIZES.lg * 2 }}>
+            <Button title={actionTitle(order.status)} onPress={onActionPress} />
           </View>
         </BottomSheetScrollView>
       </BottomSheet>
