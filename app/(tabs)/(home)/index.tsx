@@ -1,11 +1,9 @@
 import { Container } from '@/components/Container';
 import NeoView from '@/components/NeoView';
-import NotLocationGranted from '@/components/NotLocationGranted';
 import Row from '@/components/Row';
 import { Colors, SIZES } from '@/constants/Colors';
 import { useBackgroundLocation } from '@/hooks/useLocation';
 import { useOrders } from '@/hooks/useOrders';
-import { useOrdersStore } from '@/providers/ordersStore';
 import { Order, ORDER_STATUS } from '@/typing';
 import { dayjsFormat } from '@/utils/dayjs';
 import { FontAwesome } from '@expo/vector-icons';
@@ -17,12 +15,7 @@ import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'r
 const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current'];
 
 const Home = () => {
-  const {
-    config,
-
-    backgroundPermission,
-    foregroundPermission,
-  } = useBackgroundLocation();
+  const { config } = useBackgroundLocation();
 
   const { orders } = useOrders();
 
@@ -84,10 +77,6 @@ const Home = () => {
     // gt();
     // startLocationTracking();
   }, []);
-
-  if (!backgroundPermission) {
-    return <NotLocationGranted onPress={config} />;
-  }
 
   // return <OrderProgress status="Accepted By Courier" />;
 
