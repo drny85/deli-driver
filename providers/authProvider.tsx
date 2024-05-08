@@ -1,5 +1,6 @@
+import { createCourier } from '@/actions/user/createCourier';
 import { auth, usersCollection } from '@/firebase';
-import { AppUser, CustomUser } from '@/typing';
+import { Courier } from '@/typing';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -8,17 +9,20 @@ import {
   signOut,
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react';
+import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
+import { set } from 'react-hook-form';
 
 // Define custom user type
 
 // Define types for AuthContext
 interface AuthContextType {
-  user: AppUser | null;
+  user: Courier | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
   resetPasswordEmail: (email: string) => Promise<void>;
+  setUser: (user: Courier) => void;
+  loading: boolean;
 }
 
 // Create AuthContext
@@ -35,12 +39,14 @@ export const useAuth = () => {
 
 // AuthProvider component
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<AppUser | null>(null);
+  const [user, setUser] = useState<Courier | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (newUser) => {
       try {
         if (newUser) {
+          setLoading(true);
           const userDoc = doc(usersCollection, newUser.uid);
           const data = await getDoc(userDoc);
           if (!data.exists()) {
@@ -53,6 +59,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         }
       } catch (error) {
         console.log('Error on authchanged', error);
+      } finally {
+        setLoading(false);
       }
     });
 
@@ -62,6 +70,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const signIn = async (email: string, password: string) => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      console.log('USER AT SIGN IN', user?.email);
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -71,7 +80,10 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const signUp = async (email: string, password: string) => {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
-      await sendEmailVerification(user);
+      if (user) {
+        await createCourier(user.uid, email);
+        await sendEmailVerification(user);
+      }
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
@@ -102,6 +114,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     signIn,
     signUp,
     logOut,
+    setUser,
+    loading,
     resetPasswordEmail,
   };
 

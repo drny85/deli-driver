@@ -5,7 +5,7 @@ import { getReactNativePersistence, initializeAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { CollectionReference, DocumentData, collection, getFirestore } from 'firebase/firestore';
 import Constants from 'expo-constants';
-import { AppUser, Business, Order } from './typing';
+import { AppUser, Business, Courier, Order } from './typing';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -41,7 +41,7 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 
 export const businessCollection = createCollection<Business>('business');
 export const ordersCollection = createCollection<Order>('orders');
-export const usersCollection = createCollection<AppUser>('users');
+export const usersCollection = createCollection<Courier>('users');
 
 // For more information on how to access Firebase in your project,
 // see the Firebase documentation: https://firebase.google.com/docs/web/setup#access-firebase

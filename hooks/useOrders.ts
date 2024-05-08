@@ -12,6 +12,7 @@ export const useOrders = () => {
   const user = useAuth().user;
 
   useEffect(() => {
+    if (!user) return;
     const q = query(ordersCollection, where('courier.id', '==', user?.id));
     return onSnapshot(q, (snap) => {
       const data = snap.docs.map((d) => d.data() as Order);

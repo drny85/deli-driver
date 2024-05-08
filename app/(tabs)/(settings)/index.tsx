@@ -1,13 +1,14 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
 import { Container } from '@/components/Container';
-import { useUser } from '@/hooks/useUser';
+import { useAuth } from '@/providers/authProvider';
+import React from 'react';
+import { StyleSheet, Text } from 'react-native';
 
 const Settings = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   return (
     <Container>
       <Text>Welcome {user?.name}</Text>
+      <Text>Active {user?.isActive ? 'YES' : 'NO'}</Text>
     </Container>
   );
 };

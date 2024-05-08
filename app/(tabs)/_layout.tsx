@@ -2,13 +2,18 @@ import { Redirect, Tabs } from 'expo-router';
 import { Colors } from '@/constants/Colors';
 import { TabBarIcon } from '../../components/TabBarIcon';
 import { useAuth } from '@/providers/authProvider';
+import { useUser } from '@/hooks/useUser';
 
 export default function TabLayout() {
-  const { user } = useAuth();
+  const { loading: LoadingUer } = useUser();
+  const { user, loading } = useAuth();
+  console.log('TABS', user?.email);
+  if (loading || LoadingUer) return null;
 
-  if (user === null) {
+  if (!user || !user.isActive) {
     return <Redirect href={'/(auth)/login'} />;
   }
+
   return (
     <Tabs
       screenOptions={{

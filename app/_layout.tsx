@@ -16,8 +16,6 @@ export const unstable_settings = {
 export default function App() {
   const [fontsLoaded, error] = useFonts(Fonts);
 
-  console.log('FONTS', fontsLoaded, error);
-
   const onLayout = useCallback(async () => {
     if (fontsLoaded && !error) {
       await SplashScreen.hideAsync();

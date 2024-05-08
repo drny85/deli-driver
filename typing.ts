@@ -117,7 +117,6 @@ export interface AppUser {
   image?: string;
   coords: Coords | null;
   status?: 'pending' | 'completed';
-  transportation?: MapViewDirectionsMode;
   favoritesStores: string[];
   deliveryAddresses: string | [];
   provider: 'email' | 'apple' | 'google';

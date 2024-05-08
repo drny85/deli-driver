@@ -30,7 +30,7 @@ const loginSchema = z.object({
 type LoginSchema = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const { signIn } = useAuth();
+  const { signIn, user } = useAuth();
   const translateY = useSharedValue(0);
   const [showPassword, setShowPassword] = useState(false);
   const {
@@ -85,6 +85,15 @@ const Login = () => {
 
     // return keyboardListener.remove();
   }, []);
+
+  useEffect(() => {
+    if (!router) return;
+    if (user && !user.emailVerified) {
+      router.replace('/(auth)/verifyEmail');
+    } else if (user && user.emailVerified && !user.isActive) {
+      router.replace('/(auth)/onboarding');
+    }
+  }, [user, router]);
   return (
     <Container>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
