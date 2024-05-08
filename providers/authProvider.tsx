@@ -1,4 +1,5 @@
-import { auth } from '@/firebase';
+import { auth, usersCollection } from '@/firebase';
+import { AppUser, CustomUser } from '@/typing';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -6,19 +7,14 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import React, { createContext, useContext, useState, useEffect, PropsWithChildren } from 'react';
 
 // Define custom user type
-interface CustomUser {
-  id: string;
-  email: string;
-  displayName?: string | null;
-  isEmailVerified: boolean;
-}
 
 // Define types for AuthContext
 interface AuthContextType {
-  user: CustomUser | null;
+  user: AppUser | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   logOut: () => Promise<void>;
@@ -39,19 +35,24 @@ export const useAuth = () => {
 
 // AuthProvider component
 export const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [user, setUser] = useState<CustomUser | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (newUser) => {
-      if (newUser) {
-        setUser({
-          id: newUser.uid,
-          email: newUser.email || '',
-          displayName: newUser.displayName,
-          isEmailVerified: newUser.emailVerified,
-        });
-      } else {
-        setUser(null);
+    const unsubscribe = onAuthStateChanged(auth, async (newUser) => {
+      try {
+        if (newUser) {
+          const userDoc = doc(usersCollection, newUser.uid);
+          const data = await getDoc(userDoc);
+          if (!data.exists()) {
+            setUser(null);
+            return;
+          }
+          setUser({ ...data.data(), emailVerified: newUser.emailVerified });
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.log('Error on authchanged', error);
       }
     });
 

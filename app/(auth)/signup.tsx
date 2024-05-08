@@ -164,6 +164,7 @@ const Signup = () => {
                       onPress={() => setShowPassword((prev) => !prev)}
                       name={showPassword ? 'eye-slash' : 'eye'}
                       size={20}
+                      color={Colors.main}
                     />
                   }
                 />

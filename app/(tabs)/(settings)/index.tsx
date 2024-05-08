@@ -1,11 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { Container } from '@/components/Container';
+import { useUser } from '@/hooks/useUser';
 
 const Settings = () => {
+  const { user } = useUser();
   return (
     <Container>
-      <Text>Settings</Text>
+      <Text>Welcome {user?.name}</Text>
     </Container>
   );
 };

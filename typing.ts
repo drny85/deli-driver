@@ -124,6 +124,13 @@ export interface AppUser {
   createdAt: string;
 }
 
+export type CustomUser = {
+  id: string;
+  email: string;
+  displayName?: string | null;
+  isEmailVerified: boolean;
+};
+
 export interface Business {
   id?: string;
   name: string;

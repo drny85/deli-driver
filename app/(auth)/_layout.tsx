@@ -6,8 +6,8 @@ import { Colors } from '@/constants/Colors';
 const AuthLayout = () => {
   const { user } = useAuth();
 
-  if (user && !user.isEmailVerified) return <Redirect href={'/(auth)/verifyEmail'} />;
-  if (user && user.isEmailVerified) return <Redirect href={'/(tabs)/(home)'} />;
+  if (user && !user.emailVerified) return <Redirect href={'/(auth)/verifyEmail'} />;
+  if (user && user.emailVerified) return <Redirect href={'/(tabs)/(home)'} />;
   return (
     <Stack
       screenOptions={{
@@ -22,7 +22,10 @@ const AuthLayout = () => {
           title: '',
         }}
       />
-      <Stack.Screen name="signup" options={{ title: '' }} />
+      <Stack.Screen
+        name="signup"
+        options={{ title: '', headerTintColor: Colors.main, headerBackTitle: 'Back' }}
+      />
       <Stack.Screen name="verifyEmail" />
     </Stack>
   );
