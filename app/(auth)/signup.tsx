@@ -23,9 +23,11 @@ import { FontAwesome } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { router } from 'expo-router';
+import { formatPhone } from '@/utils/formatPhone';
 const signupSchema = z
   .object({
     email: z.string().email(),
+    phone: z.string().min(14, { message: 'Invalid phone formatting' }),
     password: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
     confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters long' }),
   })
@@ -54,9 +56,8 @@ const Signup = () => {
     resolver: zodResolver(signupSchema),
   });
   const handleLogin = async (values: SignupSchema) => {
-    console.log('login');
     try {
-      await signUp(values.email, values.password);
+      await signUp(values.email, values.password, values.phone);
       reset();
     } catch (error) {
       console.log(error);
@@ -114,12 +115,29 @@ const Signup = () => {
               render={({ field: { onChange, value } }) => (
                 <Input
                   autoCapitalize="none"
+                  autoComplete="off"
+                  autoFocus
+                  autoCorrect={false}
                   title="Email"
-                  valid={!getFieldState('email').invalid}
                   placeholder="Email Address"
                   value={value}
                   error={errors.email?.message}
                   onChangeText={(text) => onChange(text.toLowerCase())}
+                />
+              )}
+            />
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  autoCapitalize="none"
+                  title="Cell Phone Number"
+                  keyboardType="number-pad"
+                  placeholder="(978) 564-3210"
+                  value={value}
+                  error={errors.phone?.message}
+                  onChangeText={(text) => onChange(formatPhone(text))}
                 />
               )}
             />
@@ -131,7 +149,6 @@ const Signup = () => {
                   autoCapitalize="none"
                   title="password"
                   secureTextEntry={showPassword}
-                  valid={!getFieldState('password').invalid}
                   placeholder="Password"
                   value={value}
                   error={errors.password?.message}
@@ -154,7 +171,6 @@ const Signup = () => {
                   autoCapitalize="none"
                   title="Confirm Password"
                   secureTextEntry={showPassword}
-                  valid={!getFieldState('confirmPassword').invalid}
                   placeholder="Password"
                   value={value}
                   error={errors.confirmPassword?.message}
@@ -195,7 +211,7 @@ const styles = StyleSheet.create({
     width: 'auto',
   },
   lottieContainer: {
-    height: SIZES.height * 0.25,
+    height: SIZES.height * 0.2,
   },
   bottom: {
     gap: SIZES.sm,

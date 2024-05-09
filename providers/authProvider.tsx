@@ -18,7 +18,7 @@ import { set } from 'react-hook-form';
 interface AuthContextType {
   user: Courier | null;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signUp: (email: string, password: string, phone: string) => Promise<void>;
   logOut: () => Promise<void>;
   resetPasswordEmail: (email: string) => Promise<void>;
   setUser: (user: Courier) => void;
@@ -77,11 +77,11 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, phone: string) => {
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password);
       if (user) {
-        await createCourier(user.uid, email);
+        await createCourier(user.uid, email, phone);
         await sendEmailVerification(user);
       }
     } catch (error) {

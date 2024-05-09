@@ -1,3 +1,5 @@
+import { Colors, SIZES } from '@/constants/Colors';
+import React from 'react';
 import {
   StyleProp,
   StyleSheet,
@@ -5,26 +7,21 @@ import {
   TextInput,
   TextInputProps,
   View,
-  ViewProps,
   ViewStyle,
 } from 'react-native';
-import React from 'react';
-import NeoView from './NeoView';
-import { Colors, SIZES } from '@/constants/Colors';
 
 type Props = TextInputProps & {
   title?: string;
   error?: string;
-  valid?: boolean;
   containerStyle?: StyleProp<ViewStyle>;
   RightIcon?: React.ReactNode;
 };
-const Input = ({ valid, error, title, RightIcon, containerStyle, ...props }: Props) => {
+const Input = ({ error, title, RightIcon, containerStyle, ...props }: Props) => {
   return (
     <View style={{ width: '100%' }}>
       {title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.innerView}>
-        <TextInput style={[styles.input, valid && styles.valid, containerStyle]} {...props} />
+        <TextInput style={[styles.input, containerStyle]} {...props} />
         {RightIcon && <View style={styles.rightIcon}>{RightIcon}</View>}
       </View>
       {error && <Text style={styles.error}>{error}</Text>}
@@ -37,7 +34,7 @@ export default Input;
 const styles = StyleSheet.create({
   input: {
     height: 46,
-    borderWidth: 0.5,
+    borderWidth: 1,
     padding: 10,
     borderColor: Colors.main,
     borderRadius: SIZES.md,
@@ -52,9 +49,7 @@ const styles = StyleSheet.create({
     textTransform: 'capitalize',
     paddingBottom: SIZES.sm * 0.5,
   },
-  valid: {
-    borderWidth: 2,
-  },
+
   error: {
     fontFamily: 'Genos',
     fontSize: 16,

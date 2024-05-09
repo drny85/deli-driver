@@ -8,12 +8,20 @@ export const useUser = () => {
   const [loading, setLoading] = useState(false);
   useEffect(() => {
     if (!auth.currentUser) return;
-    console.log('CURRENT USER', auth.currentUser.email);
     setLoading(true);
+    auth.currentUser?.reload();
     const userRef = doc(usersCollection, auth.currentUser.uid);
     return onSnapshot(userRef, (snap) => {
-      if (!snap.exists()) return;
-      setUser({ ...snap.data(), emailVerified: auth.currentUser?.emailVerified! });
+      if (!snap.exists()) {
+        setLoading(false);
+        return;
+      }
+
+      setUser({
+        ...snap.data(),
+        id: auth.currentUser?.uid,
+        emailVerified: auth.currentUser?.emailVerified!,
+      });
       setLoading(false);
     });
   }, [auth.currentUser]);

@@ -1,8 +1,8 @@
 import { usersCollection } from '@/firebase';
 import { Courier } from '@/typing';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 
-export const createCourier = async (userId: string, email: string) => {
+export const createCourier = async (userId: string, email: string, phone: string) => {
   try {
     const newCourier: Courier = {
       name: '',
@@ -12,7 +12,7 @@ export const createCourier = async (userId: string, email: string) => {
       emailVerified: false,
       isActive: false,
       isOnline: false,
-      phone: '',
+      phone,
       stripeAccount: null,
       lastName: '',
       busy: false,
@@ -27,5 +27,17 @@ export const createCourier = async (userId: string, email: string) => {
     await setDoc(docRef, { ...newCourier });
   } catch (error) {
     console.log('Error adding courier', error);
+  }
+};
+
+export const updateCourier = async (courier: Courier): Promise<boolean> => {
+  try {
+    if (!courier.id) return false;
+    const courierRef = doc(usersCollection, courier.id);
+    await updateDoc(courierRef, { ...courier });
+    return true;
+  } catch (error) {
+    console.log('Error updating courier', error);
+    return false;
   }
 };

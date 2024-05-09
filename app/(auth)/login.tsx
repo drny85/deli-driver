@@ -37,7 +37,7 @@ const Login = () => {
     control,
     handleSubmit,
     reset,
-    getFieldState,
+
     formState: { errors, isSubmitting },
   } = useForm<LoginSchema>({
     defaultValues: {
@@ -90,8 +90,26 @@ const Login = () => {
     if (!router) return;
     if (user && !user.emailVerified) {
       router.replace('/(auth)/verifyEmail');
-    } else if (user && user.emailVerified && !user.isActive) {
+    } else if (
+      user &&
+      user.emailVerified &&
+      !user.isActive &&
+      !user.name &&
+      !user.lastName &&
+      !user.transportation &&
+      !user.image
+    ) {
       router.replace('/(auth)/onboarding');
+    } else if (
+      user &&
+      user.emailVerified &&
+      user.image &&
+      user.name &&
+      user.lastName &&
+      user.transportation &&
+      !user.isActive
+    ) {
+      router.replace('/(auth)/stripe-onboarding');
     }
   }, [user, router]);
   return (
@@ -109,8 +127,7 @@ const Login = () => {
               loop
             />
           </Animated.View>
-          <View
-            style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: SIZES.lg * 2 }}>
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: SIZES.lg }}>
             <Controller
               name="email"
               control={control}
@@ -118,7 +135,6 @@ const Login = () => {
                 <Input
                   autoCapitalize="none"
                   title="Email"
-                  valid={!getFieldState('email').invalid}
                   placeholder="Email Address"
                   value={value}
                   error={errors.email?.message}
@@ -134,7 +150,6 @@ const Login = () => {
                   autoCapitalize="none"
                   title="password"
                   secureTextEntry={showPassword}
-                  valid={!getFieldState('password').invalid}
                   placeholder="Password"
                   value={value}
                   error={errors.password?.message}

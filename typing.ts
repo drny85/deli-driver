@@ -173,3 +173,26 @@ export enum BUSINESS_ORDER_TYPE {
   deliveryOnly = 'deliveryOnly',
   both = 'both',
 }
+
+export type PaymentIntentParams = {
+  paymentIntentId: string;
+  paymentIntent: string;
+  ephemeralKey: string;
+  customer: string;
+  env?: string;
+};
+
+export type ConnectedAccountParams = {
+  businessName: string;
+  phone: string;
+  address?: string;
+  name: string;
+  lastName: string;
+  type: 'business' | 'courier';
+  mode?: 'live' | 'test' | undefined;
+};
+
+export interface StripeResponse {
+  success: boolean;
+  result: string | null;
+}

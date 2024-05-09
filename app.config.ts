@@ -11,7 +11,6 @@ const config: ExpoConfig = {
   name: 'deli-driver',
   slug: 'deli-driver',
   version: '1.0.0',
-
   scheme: 'deli-driver',
   web: {
     bundler: 'metro',
