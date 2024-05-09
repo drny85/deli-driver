@@ -103,6 +103,7 @@ export interface Courier extends AppUser {
   lastPictureChange?: string;
   overridingPicture?: boolean;
   agreement?: string[];
+  phoneNumberVerified: boolean;
 }
 
 export interface AppUser {

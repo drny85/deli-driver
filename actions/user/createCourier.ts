@@ -21,6 +21,7 @@ export const createCourier = async (userId: string, email: string, phone: string
       deliveryAddresses: [],
       type: 'courier',
       favoritesStores: [],
+      phoneNumberVerified: false,
     };
 
     const docRef = doc(usersCollection, userId);

@@ -15,7 +15,6 @@ const HomeLayout = () => {
         name="index"
         options={{
           headerTitle: 'Businesses',
-
           ...StackScreenWithSearchBar,
         }}
       />

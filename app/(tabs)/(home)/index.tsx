@@ -1,25 +1,46 @@
+import { updateCourier } from '@/actions/user/createCourier';
+import { Button } from '@/components/Button';
 import { Container } from '@/components/Container';
+import GoOnline from '@/components/GoOnline';
+import Loading from '@/components/Loading';
 import NeoView from '@/components/NeoView';
 import Row from '@/components/Row';
 import { Colors, SIZES } from '@/constants/Colors';
 import { useBackgroundLocation } from '@/hooks/useLocation';
 import { useOrders } from '@/hooks/useOrders';
+import { useUser } from '@/hooks/useUser';
 import { Order, ORDER_STATUS } from '@/typing';
 import { dayjsFormat } from '@/utils/dayjs';
 import { FontAwesome } from '@expo/vector-icons';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { router } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current'];
 
 const Home = () => {
   const { config } = useBackgroundLocation();
-
+  const end = useSharedValue(0);
+  const { user, loading } = useUser();
   const { orders } = useOrders();
 
   const [option, setOption] = useState(0);
+
+  const onOnlinePress = useCallback(async () => {
+    if (!user) return;
+    try {
+      console.log('Going');
+      end.value === withTiming(1, { duration: 600 });
+
+      // TIME_OUT = setTimeout(() => {
+      updateCourier({ ...user, isOnline: true });
+      // }, 1000);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [user]);
 
   const ordersToRender = useMemo(() => {
     if (option === 0)
@@ -79,6 +100,12 @@ const Home = () => {
   }, []);
 
   // return <OrderProgress status="Accepted By Courier" />;
+
+  if (loading) return <Loading />;
+
+  if (!user?.isOnline) {
+    return <GoOnline onPress={onOnlinePress} end={end} />;
+  }
 
   return (
     <Container>

@@ -15,11 +15,10 @@ export const useBusinessAvailable = (admin?: boolean) => {
   useEffect(() => {
     if (!user) return;
 
-    let q = query(businessCollection);
+    let q = query(businessCollection, where('profileCompleted', '==', true));
     return onSnapshot(businessCollection, (snap) => {
-      const data = snap.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((b) => b.couriers.includes(user?.id!));
+      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
       setBusinessAvailable(data);
       setIsLoading(false);
     });

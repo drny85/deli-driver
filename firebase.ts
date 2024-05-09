@@ -45,6 +45,9 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 export const businessCollection = createCollection<Business>('business');
 export const ordersCollection = createCollection<Order>('orders');
 export const usersCollection = createCollection<Courier>('users');
+export const couriersCollection = createCollection<{ id: string; status: 'pending' | 'completed' }>(
+  'couriers'
+);
 
 export const connectedStore = () =>
   httpsCallable<ConnectedAccountParams, StripeResponse>(
