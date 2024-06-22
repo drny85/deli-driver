@@ -1,6 +1,6 @@
 import { createCourier } from '@/actions/user/createCourier';
 import { auth, usersCollection } from '@/firebase';
-import { Courier } from '@/typing';
+import { AppUser, Courier } from '@/typing';
 import {
   createUserWithEmailAndPassword,
   onAuthStateChanged,
@@ -8,7 +8,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react';
 import { set } from 'react-hook-form';
 
@@ -22,6 +22,7 @@ interface AuthContextType {
   logOut: () => Promise<void>;
   resetPasswordEmail: (email: string) => Promise<void>;
   setUser: (user: Courier) => void;
+  updateUser: (newUser: Courier) => Promise<void>;
   loading: boolean;
 }
 
@@ -90,6 +91,16 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     }
   };
 
+  const updateUser = async (newUser: Courier) => {
+    try {
+      const userDoc = doc(usersCollection, newUser.id);
+      await updateDoc(userDoc, { ...newUser });
+    } catch (error) {
+      console.error('Update user error:', error);
+      throw error;
+    }
+  };
+
   const logOut = async () => {
     try {
       await signOut(auth);
@@ -116,6 +127,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     logOut,
     setUser,
     loading,
+    updateUser,
     resetPasswordEmail,
   };
 

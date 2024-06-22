@@ -1,5 +1,4 @@
 import { updateCourier } from '@/actions/user/createCourier';
-import { Button } from '@/components/Button';
 import { Container } from '@/components/Container';
 import GoOnline from '@/components/GoOnline';
 import Loading from '@/components/Loading';
@@ -75,7 +74,7 @@ const Home = () => {
           }}>
           <Row align="between">
             <View style={{ gap: SIZES.sm }}>
-              <Row align="between">
+              <Row align="between" containerStyle={{ width: '90%' }}>
                 <Text style={{ fontSize: 24, fontFamily: 'Genos-Bold' }}>
                   Order # {item.orderNumber}
                 </Text>

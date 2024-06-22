@@ -25,7 +25,7 @@ const MapOrderDetails = ({ order, business, distance }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.tip}>Tips {order.tip?.amount}</Text>
+      <Text style={styles.tip}>Tips {order.tip?.amount.toFixed(2)}</Text>
       <Row align="between">
         <View style={{ justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
           <Ionicons

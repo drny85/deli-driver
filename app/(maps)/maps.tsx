@@ -8,6 +8,7 @@ import Row from '@/components/Row';
 import { Colors, SIZES } from '@/constants/Colors';
 import { useBusiness } from '@/hooks/useBusiness';
 import { useBackgroundLocation } from '@/hooks/useLocation';
+import { useAuth } from '@/providers/authProvider';
 import { useLocatioStore } from '@/providers/locationStore';
 import { useOrdersStore } from '@/providers/ordersStore';
 import { Coords, Order, ORDER_STATUS } from '@/typing';
@@ -17,14 +18,13 @@ import Constants from 'expo-constants';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import MapView, { Marker, Region } from 'react-native-maps';
 import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-directions';
 import openMap from 'react-native-open-maps';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || '';
 
-const AnimatedMap = Animated.createAnimatedComponent(MapView);
 const DELTA = {
   latitudeDelta: 0.02,
   longitudeDelta: 0.02,
@@ -38,7 +38,8 @@ const Maps = () => {
   const { orderId } = useLocalSearchParams<{ orderId: string }>();
   const location = useLocatioStore((state) => state.location);
   const { getOrder, setOrders, orders, updateOrder } = useOrdersStore();
-  const order = getOrder(orderId);
+  const { updateUser, user } = useAuth();
+  const order = getOrder(orderId!);
   const { business, loading } = useBusiness(order.businessId);
 
   const [distance, setDistance] = useState<number>(0);
@@ -90,6 +91,10 @@ const Maps = () => {
       const updatedOrder: Order = { ...order, status: ORDER_STATUS.accepted_by_driver };
 
       updateOrder(updatedOrder);
+      updateUser({
+        ...user!,
+        busy: true,
+      });
 
       router.back();
       return;
@@ -99,7 +104,17 @@ const Maps = () => {
 
       openGoogleMap();
     } else if (order?.status === ORDER_STATUS.picked_up_by_driver) {
-      const updatedNewOrder: Order = { ...order, status: ORDER_STATUS.delivered };
+      const updatedNewOrder: Order = {
+        ...order,
+        status: ORDER_STATUS.delivered,
+        deliveredOn: new Date().toISOString(),
+        deliveredBy: { ...user! },
+      };
+      updateOrder(updatedNewOrder);
+      updateUser({
+        ...user!,
+        busy: false,
+      });
       setOrders([
         ...orders.map((o) => {
           if (o.id === orderId) {
@@ -144,9 +159,9 @@ const Maps = () => {
     }
   }, []);
 
-  const animatedHeight = useAnimatedStyle(() => ({
-    bottom: withTiming(SIZES.height * height.value),
-  }));
+  // const animatedHeight = useAnimatedStyle(() => ({
+  //   bottom: withTiming(SIZES.height * height.value),
+  // }));
 
   useEffect(() => {
     if (!origin || !order) return;
@@ -210,7 +225,7 @@ const Maps = () => {
     }
   }, [order]);
 
-  if (!API_KEY) return;
+  // if (!API_KEY) return;
 
   if (loading) return <Loading />;
   return (
@@ -231,8 +246,8 @@ const Maps = () => {
         }}
       />
       {origin && order.address?.coords && business?.coords && (
-        <AnimatedMap
-          style={[styles.map, animatedHeight]}
+        <MapView
+          style={[styles.map]}
           mapPadding={{
             left: 40,
             top: 50,
@@ -242,22 +257,10 @@ const Maps = () => {
           ref={mapViewRef}
           zoomEnabled
           zoomControlEnabled
-          provider={PROVIDER_GOOGLE}
           initialRegion={initialRegion}
           region={initialRegion}
           showsUserLocation
           followsUserLocation
-          // onUserLocationChange={({ nativeEvent: { coordinate } }) => {
-          //   console.log(coordinate);
-          //   if (coordinate) {
-          //     setInitialRegion({
-          //       latitude: coordinate?.latitude,
-          //       longitude: coordinate?.longitude,
-          //       ...DELTA,
-          //     });
-          //     setUserLocation({ latitude: coordinate?.latitude, longitude: coordinate?.longitude });
-          //   }
-          // }}
           zoomTapEnabled
           showsPointsOfInterest={false}
           showsBuildings={false}>
@@ -296,7 +299,7 @@ const Maps = () => {
               onReady={onMapChange}
             />
           )}
-        </AnimatedMap>
+        </MapView>
       )}
 
       <BottomSheet

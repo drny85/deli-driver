@@ -1,9 +1,8 @@
-import { View, Text } from 'react-native';
-import React, { useEffect } from 'react';
+import { Button } from '@/components/Button';
 import { Container } from '@/components/Container';
 import { useBackgroundLocation } from '@/hooks/useLocation';
-import { Button } from '@/components/Button';
-import { Redirect, router } from 'expo-router';
+import React from 'react';
+import { Text, View } from 'react-native';
 
 const notlocation = () => {
   const { config } = useBackgroundLocation();

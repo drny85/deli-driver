@@ -166,6 +166,16 @@ export interface BusinessDay {
   [key: string]: Day;
 }
 
+export type StoreCourierData = {
+  id?: string;
+  businessId: string;
+  courierId: string;
+  status: 'pending' | 'completed' | 'inactive';
+  name: string;
+  submittedOn: string;
+  phone: string;
+};
+
 interface Day {
   openAt: string;
   closeAt: string;

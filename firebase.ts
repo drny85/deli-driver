@@ -6,7 +6,14 @@ import { getStorage } from 'firebase/storage';
 import { CollectionReference, DocumentData, collection, getFirestore } from 'firebase/firestore';
 
 import { getFunctions, httpsCallable } from 'firebase/functions';
-import { Business, ConnectedAccountParams, Courier, Order, StripeResponse } from './typing';
+import {
+  Business,
+  ConnectedAccountParams,
+  Courier,
+  Order,
+  StoreCourierData,
+  StripeResponse,
+} from './typing';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -45,9 +52,7 @@ const createCollection = <T = DocumentData>(collectionName: string) => {
 export const businessCollection = createCollection<Business>('business');
 export const ordersCollection = createCollection<Order>('orders');
 export const usersCollection = createCollection<Courier>('users');
-export const couriersCollection = createCollection<{ id: string; status: 'pending' | 'completed' }>(
-  'couriers'
-);
+export const couriersCollection = createCollection<StoreCourierData>('couriers');
 
 export const connectedStore = () =>
   httpsCallable<ConnectedAccountParams, StripeResponse>(
