@@ -1,17 +1,17 @@
-import { TempOrder } from '@/typing';
+import { Order } from '@/typing';
 
 import * as Location from 'expo-location';
 import { calculateDistance } from './calculateDistance';
 
-export const sortOrderByDistance = async (orders: TempOrder[]): Promise<TempOrder[]> => {
-  const sortedOrders: TempOrder[] = [];
+export const sortOrderByDistance = async (orders: Order[]): Promise<Order[]> => {
+  const sortedOrders: Order[] = [];
   try {
     const {
       coords: { latitude, longitude },
     } = await Location.getCurrentPositionAsync({});
 
     orders.forEach((order) => {
-      const distance = calculateDistance({ latitude, longitude }, order.destination);
+      const distance = calculateDistance({ latitude, longitude }, order.address?.coords!);
 
       sortedOrders.push({ ...order, distance: distance });
     });

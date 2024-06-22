@@ -54,6 +54,7 @@ const config: ExpoConfig = {
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'com.robertdev.deli.driver',
+
     infoPlist: {
       UIBackgroundModes: ['location', 'fetch', 'remote-notification', 'audio'],
       NSLocationWhenInUseUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',

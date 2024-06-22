@@ -18,7 +18,6 @@ export const useOrders = () => {
       const data = snap.docs.map((d) => d.data() as Order);
       setOrders(data);
       storeOrder(data);
-
       setLoading(false);
     });
   }, [user]);

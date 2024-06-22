@@ -1,4 +1,5 @@
 import { updateCourier } from '@/actions/user/createCourier';
+
 import { Container } from '@/components/Container';
 import GoOnline from '@/components/GoOnline';
 import Loading from '@/components/Loading';
@@ -8,13 +9,23 @@ import { Colors, SIZES } from '@/constants/Colors';
 import { useBackgroundLocation } from '@/hooks/useLocation';
 import { useOrders } from '@/hooks/useOrders';
 import { useUser } from '@/hooks/useUser';
+import { useOrdersStore } from '@/providers/ordersStore';
 import { Order, ORDER_STATUS } from '@/typing';
 import { dayjsFormat } from '@/utils/dayjs';
+
 import { FontAwesome } from '@expo/vector-icons';
 import SegmentedControl from '@react-native-segmented-control/segmented-control';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Alert,
+  FlatList,
+  ListRenderItem,
+  Text,
+  TouchableOpacity,
+  View,
+  Button,
+} from 'react-native';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current'];
@@ -23,7 +34,8 @@ const Home = () => {
   const { config } = useBackgroundLocation();
   const end = useSharedValue(0);
   const { user, loading } = useUser();
-  const { orders } = useOrders();
+  const { orders, setOrders } = useOrdersStore();
+  const { loading: loadingOrders } = useOrders();
 
   const [option, setOption] = useState(0);
 
@@ -56,6 +68,7 @@ const Home = () => {
 
     return (
       <TouchableOpacity
+        style={{ borderRadius: SIZES.sm, backgroundColor: Colors.primary }}
         onPress={() => {
           if (disabled && item.status !== ORDER_STATUS.picked_up_by_driver) {
             Alert.alert('Current Order', 'You must deliver the current order first', [
@@ -91,7 +104,7 @@ const Home = () => {
 
   useEffect(() => {
     // const gt = async () => {
-    //   const or = await sortOrderByDistance(ordersData);
+    //   const or = await sortOrderByDistance(orders);
     //   setOrders(or);
     // };
     // gt();
@@ -100,7 +113,7 @@ const Home = () => {
 
   // return <OrderProgress status="Accepted By Courier" />;
 
-  if (loading) return <Loading />;
+  if (loading || loadingOrders) return <Loading />;
 
   if (!user?.isOnline) {
     return <GoOnline onPress={onOnlinePress} end={end} />;
@@ -109,15 +122,21 @@ const Home = () => {
   return (
     <Container>
       <View style={{ flex: 1, paddingHorizontal: SIZES.md }}>
-        <Text
-          style={{
-            textAlign: 'center',
-            fontFamily: 'Genos-Bold',
-            fontSize: 30,
-            marginBottom: SIZES.md,
-          }}>
-          Orders
-        </Text>
+        <Row align="between" containerStyle={{ marginBottom: SIZES.md }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              fontFamily: 'Genos-Bold',
+              fontSize: 30,
+            }}>
+            Orders
+          </Text>
+          <Button
+            disabled={orders.length === 0}
+            title="By Distance"
+            onPress={() => router.push('/(maps)/nextOrder')}
+          />
+        </Row>
         <SegmentedControl
           values={ORDER_OPTIONS}
           onChange={(event) => {

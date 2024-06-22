@@ -41,6 +41,7 @@ const NextOrder = () => {
 
   return (
     <Container>
+      <Text style={{ textAlign: 'center', fontSize: 20 }}>{moreOrders.length} remaining</Text>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: SIZES.lg }}>
         <Text>nextOrder</Text>
         <Button title="All Orders" onPress={() => router.push('/(tabs)/(home)')} />

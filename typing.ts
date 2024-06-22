@@ -64,12 +64,6 @@ export interface Order {
   otpPickup?: number | null;
   distance?: number;
 }
-export type TempOrder = {
-  id: string;
-  destination: Coords;
-  status: OrderStatus;
-  distance?: number;
-};
 
 export enum ORDER_TYPE {
   pickup = 'pickup',

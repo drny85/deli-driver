@@ -22,6 +22,7 @@ import MapView, { Marker, Region } from 'react-native-maps';
 import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-directions';
 import openMap from 'react-native-open-maps';
 import { useSharedValue, withTiming } from 'react-native-reanimated';
+import OTP from './otp';
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || '';
 
@@ -41,6 +42,7 @@ const Maps = () => {
   const { updateUser, user } = useAuth();
   const order = getOrder(orderId!);
   const { business, loading } = useBusiness(order.businessId);
+  const [show, setShow] = useState(false);
 
   const [distance, setDistance] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
@@ -90,7 +92,9 @@ const Maps = () => {
     if (order?.status === ORDER_STATUS.marked_ready_for_delivery) {
       const updatedOrder: Order = { ...order, status: ORDER_STATUS.accepted_by_driver };
 
-      updateOrder(updatedOrder);
+      const success = await updateOrder(updatedOrder);
+
+      if (!success) return;
       updateUser({
         ...user!,
         busy: true,
@@ -100,32 +104,40 @@ const Maps = () => {
       return;
     } else if (order?.status === ORDER_STATUS.accepted_by_driver) {
       const updatedNewOrder: Order = { ...order, status: ORDER_STATUS.picked_up_by_driver };
-      updateOrder(updatedNewOrder);
+      const success = await updateOrder(updatedNewOrder);
+      if (!success) return;
 
       openGoogleMap();
     } else if (order?.status === ORDER_STATUS.picked_up_by_driver) {
-      const updatedNewOrder: Order = {
-        ...order,
-        status: ORDER_STATUS.delivered,
-        deliveredOn: new Date().toISOString(),
-        deliveredBy: { ...user! },
-      };
-      updateOrder(updatedNewOrder);
-      updateUser({
-        ...user!,
-        busy: false,
-      });
-      setOrders([
-        ...orders.map((o) => {
-          if (o.id === orderId) {
-            return updatedNewOrder;
-          }
-          return o;
-        }),
-      ]);
-      router.push('/(maps)/nextOrder');
+      setShow(true);
     }
   };
+
+  const completeDelivery = useCallback(async () => {
+    const updatedNewOrder: Order = {
+      ...order,
+      status: ORDER_STATUS.delivered,
+      otpPickup: null,
+      deliveredOn: new Date().toISOString(),
+      deliveredBy: { ...user! },
+    };
+    const success = await updateOrder(updatedNewOrder);
+    if (!success) return;
+    updateUser({
+      ...user!,
+      busy: false,
+    });
+    setOrders([
+      ...orders.map((o) => {
+        if (o.id === orderId) {
+          return updatedNewOrder;
+        }
+        return o;
+      }),
+    ]);
+
+    router.replace('/(maps)/nextOrder');
+  }, []);
 
   // const order = useMemo(() => findUndeliveredOrder(orders, origin!), [orders]);
   // console.log(order);
@@ -274,7 +286,7 @@ const Maps = () => {
             <Marker coordinate={order.address.coords} title="Customer" identifier="destination" />
           )}
 
-          {origin && order && order.address.coords && restaurant && (
+          {origin && order && order.address.coords && restaurant && bottomSheetRef.current && (
             <MapViewDirections
               apikey={API_KEY}
               origin={origin}
@@ -304,7 +316,7 @@ const Maps = () => {
 
       <BottomSheet
         ref={bottomSheetRef}
-        snapPoints={snapshots}
+        snapPoints={snapshots || []}
         backgroundStyle={{ backgroundColor: Colors.white }}
         onChange={(change) => {
           if (change === 1) {
@@ -336,6 +348,17 @@ const Maps = () => {
           </View>
         </BottomSheetScrollView>
       </BottomSheet>
+      <OTP
+        title="Delivery PIN"
+        show={show}
+        setShow={setShow}
+        code={order.otpPickup!}
+        lenght={4}
+        callBack={() => {
+          completeDelivery();
+          setShow(false);
+        }}
+      />
     </View>
   );
 };
