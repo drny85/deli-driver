@@ -1,13 +1,13 @@
-import { View, Text } from 'react-native';
-import React from 'react';
-import { Container } from '@/components/Container';
+import { View, Text } from 'react-native'
+import React from 'react'
+import { Container } from '@/components/Container'
 
 const Deliveries = () => {
-  return (
-    <Container>
-      <Text>Deliveries</Text>
-    </Container>
-  );
-};
+   return (
+      <Container>
+         <Text>Deliveries</Text>
+      </Container>
+   )
+}
 
-export default Deliveries;
+export default Deliveries

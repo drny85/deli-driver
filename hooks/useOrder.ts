@@ -1,8 +1,8 @@
-import { OrderStatus } from '@/typing';
-import { useState } from 'react';
+import { OrderStatus } from '@/typing'
+import { useState } from 'react'
 
 export const useOrder = () => {
-  const [status, setStatus] = useState<OrderStatus | null>(null);
+   const [status, setStatus] = useState<OrderStatus | null>(null)
 
-  return { status };
-};
+   return { status }
+}

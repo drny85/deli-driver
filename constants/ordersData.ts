@@ -1,30 +1,30 @@
-import { TempOrder } from '@/typing';
+import { TempOrder } from '@/typing'
 
 export const ordersData: TempOrder[] = [
-  {
-    id: '1',
-    destination: { latitude: 40.83017, longitude: -73.91595 }, // New York
-    status: 'Ready For Delivery',
-  },
-  {
-    id: '2',
-    destination: { latitude: 40.83399, longitude: -73.90537 }, // Los Angeles
-    status: 'Ready For Delivery',
-  },
-  {
-    id: '3',
-    destination: { latitude: 40.81574, longitude: -73.91278 }, // London
-    status: 'Ready For Delivery',
-  },
-  {
-    id: '4',
-    destination: { latitude: 40.82658, longitude: -73.90762 }, // London
-    status: 'Ready For Delivery',
-  },
-  {
-    id: '5',
-    destination: { latitude: 40.833, longitude: -73.90109 }, // London
-    status: 'Ready For Delivery',
-  },
-  // Add more orders as needed
-];
+   {
+      id: '1',
+      destination: { latitude: 40.83017, longitude: -73.91595 }, // New York
+      status: 'Ready For Delivery'
+   },
+   {
+      id: '2',
+      destination: { latitude: 40.83399, longitude: -73.90537 }, // Los Angeles
+      status: 'Ready For Delivery'
+   },
+   {
+      id: '3',
+      destination: { latitude: 40.81574, longitude: -73.91278 }, // London
+      status: 'Ready For Delivery'
+   },
+   {
+      id: '4',
+      destination: { latitude: 40.82658, longitude: -73.90762 }, // London
+      status: 'Ready For Delivery'
+   },
+   {
+      id: '5',
+      destination: { latitude: 40.833, longitude: -73.90109 }, // London
+      status: 'Ready For Delivery'
+   }
+   // Add more orders as needed
+]

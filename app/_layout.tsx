@@ -1,52 +1,52 @@
-import { Stack } from 'expo-router';
+import { Stack } from 'expo-router'
 
-import { Fonts } from '@/constants/fonts';
-import { AuthProvider } from '@/providers/authProvider';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import { useCallback } from 'react';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-SplashScreen.preventAutoHideAsync();
+import { Fonts } from '@/constants/fonts'
+import { AuthProvider } from '@/providers/authProvider'
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
+import { useFonts } from 'expo-font'
+import * as SplashScreen from 'expo-splash-screen'
+import { useCallback } from 'react'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+SplashScreen.preventAutoHideAsync()
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
+   // Ensure that reloading on `/modal` keeps a back button present.
+   initialRouteName: '(tabs)'
+}
 export default function App() {
-  const [fontsLoaded, error] = useFonts(Fonts);
+   const [fontsLoaded, error] = useFonts(Fonts)
 
-  const onLayout = useCallback(async () => {
-    if (fontsLoaded && !error) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, error]);
+   const onLayout = useCallback(async () => {
+      if (fontsLoaded && !error) {
+         await SplashScreen.hideAsync()
+      }
+   }, [fontsLoaded, error])
 
-  if (!fontsLoaded) {
-    return null;
-  }
+   if (!fontsLoaded) {
+      return null
+   }
 
-  return (
-    <BottomSheetModalProvider>
-      <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>
-        <AuthProvider>
-          <RootLayout />
-        </AuthProvider>
-      </GestureHandlerRootView>
-    </BottomSheetModalProvider>
-  );
+   return (
+      <BottomSheetModalProvider>
+         <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>
+            <AuthProvider>
+               <RootLayout />
+            </AuthProvider>
+         </GestureHandlerRootView>
+      </BottomSheetModalProvider>
+   )
 }
 
 // You can explore the built-in icon families and icons on the web at XXXXXXXXXXXXXXXXXXXXXXX
 
 function RootLayout() {
-  return (
-    <Stack screenOptions={{ animation: 'slide_from_bottom' }} initialRouteName="(tabs)">
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="(maps)" options={{ headerShown: false }} />
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="notlocation" options={{ headerShown: false }} />
-      {/* <Stack.Screen
+   return (
+      <Stack screenOptions={{ animation: 'slide_from_bottom' }} initialRouteName="(tabs)">
+         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+         <Stack.Screen name="(maps)" options={{ headerShown: false }} />
+         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+         <Stack.Screen name="notlocation" options={{ headerShown: false }} />
+         {/* <Stack.Screen
         name="quiz"
         options={{
           headerStyle: {
@@ -73,6 +73,6 @@ function RootLayout() {
           animationDuration: 500,
         }}
       /> */}
-    </Stack>
-  );
+      </Stack>
+   )
 }

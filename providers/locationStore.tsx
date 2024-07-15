@@ -1,29 +1,44 @@
-import { Coords } from '@/typing';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { updateCourier } from '@/actions/user/createCourier'
+import { auth, usersCollection } from '@/firebase'
+import { Coords } from '@/typing'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { doc, getDoc } from 'firebase/firestore'
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 
 type LocationStore = {
-  location: Coords | null;
-  setLocation: (coords: Coords) => void;
-  getLocation: () => Coords;
-};
+   location: Coords | null
+   setLocation: (coords: Coords) => void
+   getLocation: () => Coords
+}
 
 export const useLocatioStore = create<LocationStore>()(
-  persist(
-    (set, get) => ({
-      location: null,
-      setLocation: (coords) => set({ location: coords }),
-      getLocation: () => {
-        return get().location!;
-      },
-    }),
-    {
-      name: 'location-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
-);
+   persist(
+      (set, get) => ({
+         location: null,
+         setLocation: async (coords) => {
+            const user = auth.currentUser
+            if (user) {
+               const userRef = doc(usersCollection, user.uid)
+               const userData = await getDoc(userRef)
+               const data = userData.data()
+               // if (userData.exists()) {
+               //    console.log('Updating user location')
+               //    await updateCourier({ ...data!, coords })
+               // }
+            }
+            set({ location: coords })
+         },
+         getLocation: () => {
+            return get().location!
+         }
+      }),
+      {
+         name: 'location-storage',
+         storage: createJSONStorage(() => AsyncStorage)
+      }
+   )
+)
 
-export const location = useLocatioStore.getState().getLocation();
-export const setLocation = useLocatioStore.getState().setLocation;
+export const location = useLocatioStore.getState().getLocation()
+export const setLocation = useLocatioStore.getState().setLocation
