@@ -71,7 +71,10 @@ const config: ExpoConfig = {
       }
    },
    extra: {
-      env: filteredEnv
+      env: filteredEnv,
+      eas: {
+         projectId: '6683f544-5343-4401-8c5d-89a47c2e20dc'
+      }
    }
 }
 
