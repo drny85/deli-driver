@@ -27,7 +27,9 @@ export const useBackgroundLocation = () => {
          }
 
          const currentLocation = await getForgroundLocation()
-         setCurrent(currentLocation.coords)
+         if (currentLocation) {
+            setCurrent(currentLocation.coords)
+         }
 
          await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
             accuracy: Location.Accuracy.Highest,
@@ -48,7 +50,8 @@ export const useBackgroundLocation = () => {
       }
    }
 
-   const getForgroundLocation: () => Promise<Location.LocationObject> = async () => {
+   const getForgroundLocation: () => Promise<Location.LocationObject | null> = async () => {
+      if (!foregroundPermission?.granted) return null
       const location = await Location.getCurrentPositionAsync({
          accuracy: Location.Accuracy.Balanced
       })

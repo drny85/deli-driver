@@ -36,7 +36,6 @@ const config: ExpoConfig = {
    ],
    experiments: {
       typedRoutes: true,
-
       tsconfigPaths: true
    },
 
@@ -68,7 +67,8 @@ const config: ExpoConfig = {
       adaptiveIcon: {
          foregroundImage: './assets/adaptive-icon.png',
          backgroundColor: '#ffffff'
-      }
+      },
+      package: 'com.robertdev.deli.driver'
    },
    extra: {
       env: filteredEnv,

@@ -7,9 +7,6 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 
 export default function TabLayout() {
    const { loading, user } = useUser()
-
-   const { getForgroundLocation } = useBackgroundLocation()
-   getForgroundLocation()
    if (loading) return null
 
    if (!user || !user.isActive) {

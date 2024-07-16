@@ -1,7 +1,7 @@
-import { Stack } from 'expo-router'
+import { Redirect, Slot, Stack } from 'expo-router'
 
 import { Fonts } from '@/constants/fonts'
-import { AuthProvider } from '@/providers/authProvider'
+import { AuthProvider, useAuth } from '@/providers/authProvider'
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'

@@ -1,11 +1,14 @@
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { useBackgroundLocation } from '@/hooks/useLocation'
+import { Redirect } from 'expo-router'
 import React from 'react'
 import { Text, View } from 'react-native'
 
 const notlocation = () => {
-   const { config } = useBackgroundLocation()
+   const { config, backgroundPermission } = useBackgroundLocation()
+   console.log('NOT From NOT', backgroundPermission)
+   if (backgroundPermission?.granted) return <Redirect href={'/'} />
 
    return (
       <Container>

@@ -1,6 +1,6 @@
 import { createCourier } from '@/actions/user/createCourier'
 import { auth, usersCollection } from '@/firebase'
-import { AppUser, Courier } from '@/typing'
+import { Courier } from '@/typing'
 import {
    createUserWithEmailAndPassword,
    onAuthStateChanged,
@@ -10,7 +10,6 @@ import {
 } from 'firebase/auth'
 import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import React, { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
-import { set } from 'react-hook-form'
 
 // Define custom user type
 
@@ -104,7 +103,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
    const logOut = async () => {
       try {
          await signOut(auth)
-         setUser(null)
+         //setUser(null)
       } catch (error) {
          console.error('Sign out error:', error)
          throw error
