@@ -1,12 +1,11 @@
 import { useBackgroundLocation } from '@/hooks/useLocation'
-import { Stack } from 'expo-router'
+import { Redirect, Stack } from 'expo-router'
 import React from 'react'
 
 const HomeLayout = () => {
-   const { backgroundPermission } = useBackgroundLocation()
-   console.log('NOT', backgroundPermission)
+   // console.log('backgroundPermission', backgroundPermission?.granted)
 
-   //if (!backgroundPermission?.granted) return <Redirect href={'/notlocation'} />
+   // if (!backgroundPermission?.granted) return <Redirect href={'/notlocation'} />
    return (
       <Stack>
          <Stack.Screen name="index" />

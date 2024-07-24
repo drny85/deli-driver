@@ -1,9 +1,8 @@
-import { Redirect, Tabs } from 'expo-router'
+import { TabBarIcon } from '@/components/TabBarIcon'
 import { Colors } from '@/constants/Colors'
-import { TabBarIcon } from '../../components/TabBarIcon'
 import { useUser } from '@/hooks/useUser'
-import { useBackgroundLocation } from '@/hooks/useLocation'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
+import { Redirect, Tabs } from 'expo-router'
 
 export default function TabLayout() {
    const { loading, user } = useUser()
@@ -12,6 +11,9 @@ export default function TabLayout() {
    if (!user || !user.isActive) {
       return <Redirect href={'/(auth)/login'} />
    }
+
+   // if (!user && backgroundPermission?.granted) return <Redirect href={'/(auth)/login'} />
+   // if (user && !backgroundPermission?.granted) return <Redirect href={'/notlocation'} />
 
    return (
       <Tabs

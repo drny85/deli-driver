@@ -1,3 +1,5 @@
+import { updateCourier } from '@/actions/user/createCourier'
+import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
 import { useAuth } from '@/providers/authProvider'
 import React from 'react'
@@ -9,6 +11,8 @@ const Settings = () => {
       <Container>
          <Text>Welcome {user?.name}</Text>
          <Text>Active {user?.isActive ? 'YES' : 'NO'}</Text>
+
+         <Button title="Go Offline" onPress={() => updateCourier({ ...user!, isOnline: false })} />
       </Container>
    )
 }

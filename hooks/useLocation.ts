@@ -1,6 +1,7 @@
 import { useLocatioStore } from '@/providers/locationStore'
 import { distanceBetweenCoords } from '@/utils/distanceBetweenCoords'
 import * as Location from 'expo-location'
+import { router } from 'expo-router'
 import * as TaskManager from 'expo-task-manager'
 import { useEffect, useState } from 'react'
 const LOCATION_TASK_NAME = 'background-location-task'
@@ -12,7 +13,7 @@ export const useBackgroundLocation = () => {
    const [locationStarted, setLocationStarted] = useState(false)
    const [clicked, setClicked] = useState(0)
    const [foregroundPermission, setForegroundPermission] = useState<Location.PermissionResponse>()
-   const [backgroundPermission, setBackgroundPermission] = useState<Location.PermissionResponse>()
+   const [backgroundPermission, setBackgroundPermission] = useState<boolean>(false)
    const setCurrent = useLocatioStore((s) => s.setLocation)
 
    const startLocationTracking = async () => {
@@ -70,32 +71,28 @@ export const useBackgroundLocation = () => {
       })
    }
 
-   const config = async (): Promise<boolean> => {
+   const config = async () => {
       try {
          let resf = await Location.requestForegroundPermissionsAsync()
          let resb = await Location.requestBackgroundPermissionsAsync()
 
          if (resf.status != 'granted' || resb.status !== 'granted') {
-            console.log('Permission to access location was denied')
-
-            setForegroundPermission(resf)
-            setClicked((prev) => prev + 1)
-            return false
+            router.replace('/notlocation')
          } else {
             console.log('Permission to access location granted', resb.status)
-            setBackgroundPermission(resb)
-
-            return true
+            router.replace('/(tabs)')
          }
       } catch (error) {
          console.log(error)
-
-         return false
       }
    }
 
    useEffect(() => {
-      config()
+      let mounted = true
+      if (mounted) {
+         //config()
+         console.log(mounted)
+      }
    }, [])
 
    return {
@@ -104,6 +101,7 @@ export const useBackgroundLocation = () => {
       getForgroundLocation,
       foregroundPermission,
       backgroundPermission,
+      locationStarted,
       clicked,
       setClicked,
       config

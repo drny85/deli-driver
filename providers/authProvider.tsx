@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
    const logOut = async () => {
       try {
          await signOut(auth)
-         //setUser(null)
+         setUser(null)
       } catch (error) {
          console.error('Sign out error:', error)
          throw error

@@ -1,12 +1,10 @@
 import { updateCourier } from '@/actions/user/createCourier'
 
-import { Container } from '@/components/Container'
 import GoOnline from '@/components/GoOnline'
 import Loading from '@/components/Loading'
 import NeoView from '@/components/NeoView'
 import Row from '@/components/Row'
 import { Colors, SIZES } from '@/constants/Colors'
-import { useBackgroundLocation } from '@/hooks/useLocation'
 import { useOrders } from '@/hooks/useOrders'
 import { useUser } from '@/hooks/useUser'
 import { useOrdersStore } from '@/providers/ordersStore'
@@ -17,13 +15,12 @@ import { FontAwesome } from '@expo/vector-icons'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
 import { router, Stack } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View, Button } from 'react-native'
+import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 
 const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current']
 
 const Home = () => {
-   const { config } = useBackgroundLocation()
    const end = useSharedValue(0)
    const { user, loading } = useUser()
    const { orders, setOrders } = useOrdersStore()

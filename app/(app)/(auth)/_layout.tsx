@@ -7,13 +7,13 @@ import React from 'react'
 const AuthLayout = () => {
    const { loading, user } = useUser()
 
+   if (loading) {
+      return <Loading />
+   }
+
    if (user && user.emailVerified && user.type === 'courier' && user.isActive) {
       console.log('ONBOARDING COMPLETED')
       return <Redirect href={'/(tabs)/(home)'} />
-   }
-
-   if (loading) {
-      return <Loading />
    }
 
    return (
