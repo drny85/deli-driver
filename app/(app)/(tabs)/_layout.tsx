@@ -1,11 +1,13 @@
 import { TabBarIcon } from '@/components/TabBarIcon'
 import { Colors } from '@/constants/Colors'
+import { useOrders } from '@/hooks/useOrders'
 import { useUser } from '@/hooks/useUser'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
 import { Redirect, Tabs } from 'expo-router'
 
 export default function TabLayout() {
    const { loading, user } = useUser()
+   useOrders()
    if (loading) return null
 
    if (!user || !user.isActive) {

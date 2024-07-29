@@ -1,7 +1,5 @@
 import { Button } from '@/components/Button'
 import { Container } from '@/components/Container'
-import { useBackgroundLocation } from '@/hooks/useLocation'
-import { Redirect } from 'expo-router'
 
 import { Linking, Text, View } from 'react-native'
 

@@ -55,6 +55,8 @@ const VerifyEmail = () => {
             </Animated.View>
             <Button
                title="Refresh"
+               contentTextStyle={{ paddingHorizontal: SIZES.lg * 2, fontWeight: '700' }}
+               contentContainerStyle={{ borderRadius: SIZES.lg * 2 }}
                onPress={() => {
                   if (auth.currentUser?.emailVerified) {
                      setUser({ ...user!, emailVerified: auth.currentUser.emailVerified })

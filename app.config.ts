@@ -25,11 +25,12 @@ const config: ExpoConfig = {
       [
          'expo-location',
          {
-            locationAlwaysAndWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
+            locationAlwaysAndWhenInUsePermission:
+               'Allow Deli-Driver app to use your background location while you the app is on the background.',
 
-            locationAlwaysPermission: 'Allow $(PRODUCT_NAME) to use your location.',
-            locationWhenInUsePermission: 'Allow $(PRODUCT_NAME) to use your location.',
-            NSLocationUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
+            locationAlwaysPermission: 'Allow $(PRODUCT_NAME) -2 to use your location.',
+            locationWhenInUsePermission: 'Allow Deli-Driver app to use your location.',
+            NSLocationUsageDescription: 'Allow $(PRODUCT_NAME) -4 to use your location.',
             isIosBackgroundLocationEnabled: true,
             isAndroidBackgroundLocationEnabled: true
          }
@@ -60,7 +61,7 @@ const config: ExpoConfig = {
          NSLocationWhenInUseUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
          NSLocationAlwaysAndWhenInUseUsageDescription:
             'Allow $(PRODUCT_NAME) to use your location.',
-         NSLocationAlwaysUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.',
+         NSLocationAlwaysUsageDescription: 'Allow $(PRODUCT_NAME) -- to use your location.',
          NSLocationUsageDescription: 'Allow $(PRODUCT_NAME) to use your location.'
       }
    },

@@ -1,4 +1,5 @@
 import { Dimensions } from 'react-native'
+import Constants from 'expo-constants'
 const { width, height } = Dimensions.get('window')
 export const Colors = {
    primary: '#DEE9F7',
@@ -14,5 +15,6 @@ export const SIZES = {
    md: 16,
    lg: 22,
    width,
-   height
+   height,
+   statusBarHeight: Constants.statusBarHeight
 }

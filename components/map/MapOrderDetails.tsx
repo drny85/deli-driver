@@ -44,18 +44,19 @@ const MapOrderDetails = ({ order, business, distance }: Props) => {
             <View style={{ gap: SIZES.lg }}>
                <Row>
                   <View style={styles.item}>
-                     <Row align="between">
-                        <Text style={[styles.title, { fontSize: 24 }]}>Pick Up At</Text>
-                        <NeoView rounded size={36}>
+                     <Text style={[styles.title, { fontSize: 24 }]}>Pick Up At</Text>
+                     <Row align="between" containerStyle={{ marginBottom: SIZES.sm }}>
+                        <Text style={[{ fontSize: 20, fontFamily: 'Manjari-Bold' }]}>
+                           {business.name}
+                        </Text>
+                        <NeoView rounded size={36} outterContainerStyles={{ borderRadius: 999 }}>
                            <TouchableOpacity
                               onPress={async () => await makeCall(order.contactPerson.phone)}>
-                              <Ionicons name="call" size={20} color={Colors.main} />
+                              <Ionicons name="call" size={22} color={Colors.main} />
                            </TouchableOpacity>
                         </NeoView>
                      </Row>
-                     <Text style={[{ fontSize: 20, fontFamily: 'Manjari-Bold' }]}>
-                        {business.name}
-                     </Text>
+
                      <Text style={styles.subtitle}>{business.address?.slice(0, -5)}</Text>
                   </View>
                </Row>
@@ -63,14 +64,14 @@ const MapOrderDetails = ({ order, business, distance }: Props) => {
                <Row>
                   <View style={styles.item}>
                      <Text style={styles.title}>Deliver To</Text>
-                     <Row align="between">
+                     <Row align="between" containerStyle={{ marginBottom: SIZES.sm }}>
                         <Text style={[{ fontSize: 20, fontFamily: 'Manjari-Bold' }]}>
                            {order.contactPerson.name} {order.contactPerson.lastName}
                         </Text>
-                        <NeoView rounded size={36}>
+                        <NeoView rounded size={36} outterContainerStyles={{ borderRadius: 999 }}>
                            <TouchableOpacity
                               onPress={async () => await makeCall(order.contactPerson.phone)}>
-                              <Ionicons name="call" size={20} color={Colors.main} />
+                              <Ionicons name="call" size={22} color={Colors.main} />
                            </TouchableOpacity>
                         </NeoView>
                      </Row>

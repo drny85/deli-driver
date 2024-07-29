@@ -1,23 +1,35 @@
 import { Colors } from '@/constants/Colors'
 import { forwardRef } from 'react'
-import { StyleSheet, Text, TouchableOpacity, TouchableOpacityProps, ViewStyle } from 'react-native'
+import {
+   StyleSheet,
+   Text,
+   TextStyle,
+   TouchableOpacity,
+   TouchableOpacityProps,
+   ViewStyle
+} from 'react-native'
 import NeoView from './NeoView'
 
 type ButtonProps = {
    onPress?: TouchableOpacityProps['onPress']
    title?: string
    contentContainerStyle?: ViewStyle
+   contentTextStyle?: TextStyle
 } & TouchableOpacityProps
 
 export const Button = forwardRef<TouchableOpacity, ButtonProps>(
-   ({ onPress, title, contentContainerStyle }, ref) => {
+   ({ onPress, title, contentContainerStyle, contentTextStyle }, ref) => {
       return (
-         <NeoView containerStyle={[{ borderRadius: styles.button.borderRadius }]}>
+         <NeoView
+            outterContainerStyles={contentContainerStyle}
+            containerStyle={[
+               { borderRadius: styles.button.borderRadius, backgroundColor: '#ffffff' }
+            ]}>
             <TouchableOpacity
                ref={ref}
                style={[styles.button, contentContainerStyle]}
                onPress={onPress}>
-               <Text style={styles.buttonText}>{title}</Text>
+               <Text style={[styles.buttonText, contentTextStyle]}>{title}</Text>
             </TouchableOpacity>
          </NeoView>
       )
@@ -33,7 +45,7 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'center',
       padding: 16,
-      shadowColor: '#000',
+      shadowColor: 'rbga(0,0,0,0.3)',
       shadowOffset: {
          height: 2,
          width: 0

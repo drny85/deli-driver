@@ -155,7 +155,7 @@ const Login = () => {
                         <Input
                            autoCapitalize="none"
                            title="password"
-                           secureTextEntry={showPassword}
+                           secureTextEntry={!showPassword}
                            placeholder="Password"
                            value={value}
                            error={errors.password?.message}

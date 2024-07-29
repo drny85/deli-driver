@@ -16,18 +16,26 @@ const MapHeader = ({ onPress, onCenterPress }: Props) => {
    const { top } = useSafeAreaInsets()
    return (
       <View style={[styles.container, { top }]}>
-         <NeoView rounded size={56} containerStyle={{ opacity: 0.7 }}>
+         <NeoView
+            rounded
+            size={56}
+            containerStyle={{ opacity: 0.7 }}
+            outterContainerStyles={{ borderRadius: 999, height: 56, width: 56 }}>
             <TouchableOpacity onPress={() => router.back()}>
                <FontAwesome name="chevron-left" size={26} color={Colors.main} />
             </TouchableOpacity>
          </NeoView>
          <View style={{ gap: SIZES.md }}>
-            <NeoView rounded size={56} containerStyle={{ opacity: 0.7 }}>
+            <NeoView
+               rounded
+               size={56}
+               containerStyle={{ opacity: 0.7 }}
+               outterContainerStyles={{ borderRadius: 999 }}>
                <TouchableOpacity onPress={onPress}>
                   <Ionicons name="navigate" size={24} color={Colors.main} />
                </TouchableOpacity>
             </NeoView>
-            <NeoView rounded size={56}>
+            <NeoView rounded size={56} outterContainerStyles={{ borderRadius: 999 }}>
                <TouchableOpacity onPress={onCenterPress}>
                   <MaterialIcons name="location-searching" size={24} color={Colors.main} />
                </TouchableOpacity>

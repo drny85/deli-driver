@@ -1,10 +1,11 @@
 import { Colors } from '@/constants/Colors'
 import { useFont } from '@shopify/react-native-skia'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Text, TouchableOpacity, View } from 'react-native'
-import { SharedValue, useSharedValue } from 'react-native-reanimated'
+import { useSharedValue, withTiming } from 'react-native-reanimated'
 import { Container } from './Container'
 import CircularProgressBar from './ScoreCircle'
+import { set } from 'react-hook-form'
 
 const radius = 100 // Example radius
 
@@ -14,12 +15,27 @@ const height = diameter
 
 type Props = {
    onPress: () => void
-   end: SharedValue<number>
 }
 
-const GoOnline = ({ onPress, end }: Props) => {
+const GoOnline = ({ onPress }: Props) => {
    const progress = useSharedValue(1)
+   const end = useSharedValue(0)
    const font = useFont(require('@/assets/fonts/Genos-SemiBold.ttf'), 40)
+   const [finish, setFinish] = useState(false)
+   const [text, setText] = useState('Go Online')
+
+   useEffect(() => {
+      let timer: any
+      if (finish) {
+         end.value = withTiming(1, { duration: 1000 })
+         setText('Going Online')
+         timer = setTimeout(() => {
+            onPress()
+         }, 1000)
+      }
+
+      return () => clearTimeout(timer)
+   }, [finish])
 
    return (
       <Container>
@@ -32,7 +48,9 @@ const GoOnline = ({ onPress, end }: Props) => {
                radius={radius + 30}
             />
             <TouchableOpacity
-               onPress={onPress}
+               onPress={() => {
+                  setFinish(true)
+               }}
                activeOpacity={0.6}
                style={{
                   position: 'absolute',
@@ -44,7 +62,7 @@ const GoOnline = ({ onPress, end }: Props) => {
                   alignItems: 'center',
                   zIndex: 20
                }}>
-               <Text style={{ fontFamily: 'Genos-Bold', fontSize: 36 }}>Go Online</Text>
+               <Text style={{ fontFamily: 'Genos-Bold', fontSize: 32 }}>{text}</Text>
             </TouchableOpacity>
          </View>
       </Container>

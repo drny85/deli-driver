@@ -17,7 +17,7 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import Constants from 'expo-constants'
 import { router, useLocalSearchParams } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Alert, StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker, Region } from 'react-native-maps'
 import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-directions'
 import openMap from 'react-native-open-maps'
@@ -109,6 +109,13 @@ const Maps = () => {
 
          openGoogleMap()
       } else if (order?.status === ORDER_STATUS.picked_up_by_driver) {
+         if (distance > 0.7) {
+            Alert.alert(
+               'Distance',
+               `You are too far from the destination\n ${distance.toFixed(2)} miles\n \nPlease get closer`
+            )
+            return
+         }
          setShow(true)
       }
    }
@@ -181,6 +188,7 @@ const Maps = () => {
 
    useEffect(() => {
       if (!origin || !order) return
+
       // startLocationTracking();
       if (order.status === ORDER_STATUS.marked_ready_for_delivery) {
          mapViewRef.current?.fitToSuppliedMarkers(['origin', 'destination', 'restaurant'], {
@@ -191,36 +199,36 @@ const Maps = () => {
                left: 20
             }
          })
-         timeOut = setTimeout(() => {
-            mapViewRef.current?.animateToRegion({
-               ...origin,
-               ...DELTA
-            })
-         }, 1500)
-         timeOut = setTimeout(() => {
-            mapViewRef.current?.animateToRegion({
-               ...business?.coords!,
-               ...DELTA
-            })
-         }, 3500)
-         timeOut = setTimeout(() => {
-            mapViewRef.current?.animateToRegion({
-               ...order.address?.coords!,
-               ...DELTA
-            })
-         }, 5500)
-         timeOut = setTimeout(() => {
-            mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant', 'destination'], {
-               edgePadding: {
-                  top: 30,
-                  right: 30,
-                  bottom: 50,
-                  left: 30
-               }
-            })
+         // timeOut = setTimeout(() => {
+         //    mapViewRef.current?.animateToRegion({
+         //       ...origin,
+         //       ...DELTA
+         //    })
+         // }, 1500)
+         // timeOut = setTimeout(() => {
+         //    mapViewRef.current?.animateToRegion({
+         //       ...business?.coords!,
+         //       ...DELTA
+         //    })
+         // }, 3500)
+         // timeOut = setTimeout(() => {
+         //    mapViewRef.current?.animateToRegion({
+         //       ...order.address?.coords!,
+         //       ...DELTA
+         //    })
+         // }, 5500)
+         // timeOut = setTimeout(() => {
+         //    mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant', 'destination'], {
+         //       edgePadding: {
+         //          top: 30,
+         //          right: 30,
+         //          bottom: 50,
+         //          left: 30
+         //       }
+         //    })
 
-            bottomSheetRef.current?.snapToIndex(2, { duration: 500 })
-         }, 7000)
+         //    bottomSheetRef.current?.snapToIndex(2, { duration: 500 })
+         // }, 7000)
       }
 
       if (order.status === ORDER_STATUS.picked_up_by_driver) {
@@ -358,6 +366,21 @@ const Maps = () => {
                      distance={DISTANCE / distance}
                   />
                </View>
+
+               {order.deliveryInstructions && (
+                  <View>
+                     <Text
+                        style={{
+                           fontSize: 16,
+                           fontWeight: '600',
+                           color: 'grey',
+                           marginVertical: SIZES.sm
+                        }}>
+                        Delivery Instuctions
+                     </Text>
+                     <Text>{order.deliveryInstructions}</Text>
+                  </View>
+               )}
 
                <View style={{ width: '60%', alignSelf: 'center', marginVertical: SIZES.lg * 2 }}>
                   <Button

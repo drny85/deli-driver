@@ -6,7 +6,6 @@ import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { useCallback } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { useBackgroundLocation } from '@/hooks/useLocation'
 SplashScreen.preventAutoHideAsync()
 
 export const unstable_settings = {
@@ -15,12 +14,10 @@ export const unstable_settings = {
 }
 export default function App() {
    const [fontsLoaded, error] = useFonts(Fonts)
-   const { config } = useBackgroundLocation()
 
    const onLayout = useCallback(async () => {
       if (fontsLoaded && !error) {
          await SplashScreen.hideAsync()
-         config()
       }
    }, [fontsLoaded, error])
 

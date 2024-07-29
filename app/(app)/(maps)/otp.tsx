@@ -249,7 +249,7 @@ const DIGIT = ({
 }) => {
    return (
       <TouchableOpacity disabled={otp?.length === lenght} onPress={onPress} activeOpacity={0.7}>
-         <NeoView rounded size={80}>
+         <NeoView rounded size={80} outterContainerStyles={{ borderRadius: 999 }}>
             <Text style={{ fontFamily: 'Genos-Bold', fontSize: 26, color: Colors.main }}>
                {value}
             </Text>

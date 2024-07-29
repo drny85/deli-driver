@@ -7,11 +7,18 @@ type Props = {
    size?: number
    rounded?: boolean
    containerStyle?: StyleProp<ViewStyle>
+   outterContainerStyles?: StyleProp<ViewStyle>
 }
-const NeoView = ({ children, containerStyle, size, rounded = false }: Props) => {
+const NeoView = ({
+   children,
+   containerStyle,
+   size,
+   outterContainerStyles,
+   rounded = false
+}: Props) => {
    return (
-      <View style={styles.topShadow}>
-         <View style={styles.bottomShadow}>
+      <View style={[styles.topShadow, outterContainerStyles]}>
+         <View style={[styles.bottomShadow, outterContainerStyles]}>
             <View
                style={[
                   styles.inner,
@@ -41,20 +48,22 @@ const styles = StyleSheet.create({
    },
    topShadow: {
       shadowOffset: {
-         width: -6,
-         height: -6
+         width: -2,
+         height: -4
       },
-      shadowColor: Colors.secondary,
+      shadowColor: 'lightgrey',
+      backgroundColor: Colors.primary,
       shadowOpacity: 1,
-      shadowRadius: 6
+      shadowRadius: 4
    },
    bottomShadow: {
       shadowOffset: {
-         width: 6,
+         width: 2,
          height: 6
       },
       shadowColor: Colors.accent,
+      backgroundColor: Colors.accent,
       shadowOpacity: 1,
-      shadowRadius: 6
+      shadowRadius: 4
    }
 })

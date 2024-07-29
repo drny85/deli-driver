@@ -12,7 +12,6 @@ var l2
 export const useBackgroundLocation = () => {
    const [locationStarted, setLocationStarted] = useState(false)
    const [clicked, setClicked] = useState(0)
-   const [foregroundPermission, setForegroundPermission] = useState<Location.PermissionResponse>()
    const [backgroundPermission, setBackgroundPermission] = useState<boolean>(false)
    const setCurrent = useLocatioStore((s) => s.setLocation)
 
@@ -52,7 +51,6 @@ export const useBackgroundLocation = () => {
    }
 
    const getForgroundLocation: () => Promise<Location.LocationObject | null> = async () => {
-      if (!foregroundPermission?.granted) return null
       const location = await Location.getCurrentPositionAsync({
          accuracy: Location.Accuracy.Balanced
       })
@@ -77,8 +75,10 @@ export const useBackgroundLocation = () => {
          let resb = await Location.requestBackgroundPermissionsAsync()
 
          if (resf.status != 'granted' || resb.status !== 'granted') {
+            setBackgroundPermission(false)
             router.replace('/notlocation')
          } else {
+            setBackgroundPermission(true)
             console.log('Permission to access location granted', resb.status)
             router.replace('/(tabs)')
          }
@@ -90,16 +90,20 @@ export const useBackgroundLocation = () => {
    useEffect(() => {
       let mounted = true
       if (mounted) {
-         //config()
-         console.log(mounted)
+         Location.requestBackgroundPermissionsAsync()
+            .then((res) => {
+               console.log(res.status)
+               setBackgroundPermission(res.status === 'granted')
+               if (res.status !== 'granted') config()
+            })
+            .catch((err) => console.log(err))
       }
-   }, [])
+   }, [backgroundPermission])
 
    return {
       stopLocation,
       startLocationTracking,
       getForgroundLocation,
-      foregroundPermission,
       backgroundPermission,
       locationStarted,
       clicked,
