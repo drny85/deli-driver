@@ -10,15 +10,20 @@ import { Order, ORDER_STATUS } from '@/typing'
 
 import { FontAwesome } from '@expo/vector-icons'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
-import { router, Stack } from 'expo-router'
+import { router, Stack, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native'
 
 const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current']
 
+type PropsParams = {
+   index: string
+}
+
 const Deliveries = () => {
    const { user, loading } = useUser()
    const { orders: data } = useOrdersStore()
+   const { index } = useLocalSearchParams<PropsParams>()
 
    const [option, setOption] = useState(0)
 
@@ -64,13 +69,10 @@ const Deliveries = () => {
    }
 
    useEffect(() => {
-      // const gt = async () => {
-      //   const or = await sortOrderByDistance(orders);
-      //   setOrders(or);
-      // };
-      // gt();
-      // startLocationTracking();
-   }, [])
+      if (index) {
+         setOption(Number(index))
+      }
+   }, [index])
 
    // return <OrderProgress status="Accepted By Courier" />;
 

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { ScrollView, StyleSheet, View } from 'react-native'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
 
-import { addDays, format, startOfWeek, startOfMonth } from 'date-fns'
+import { addDays, format, startOfWeek, startOfMonth, set } from 'date-fns'
 import DailyEarnings from './DailyEarnings'
 
 import { Order } from '@/typing'
@@ -13,10 +13,12 @@ import EarningsChart from './EarningsChart'
 type Props = {
    orders: Order[]
 }
+type Filter = 'Day' | 'Week' | 'Month'
 const EarningsScreen: React.FC<Props> = ({ orders }) => {
-   const [selectedIndex, setSelectedIndex] = useState<number>(0)
+   const [selectedIndex, setSelectedIndex] = useState<number>(1)
 
-   const filterOrders = (orders: Order[], filter: string) => {
+   const filterOrders = (orders: Order[], filter: Filter) => {
+      if (orders.length === 0) return []
       const now = new Date()
       let filteredOrders = orders
 
@@ -39,7 +41,7 @@ const EarningsScreen: React.FC<Props> = ({ orders }) => {
       return filteredOrders
    }
 
-   const segments = ['Day', 'Week', 'Month']
+   const segments: Filter[] = ['Day', 'Week', 'Month']
    const filter = segments[selectedIndex]
    const filteredOrders = filterOrders(orders, segments[selectedIndex])
    const earningsData = calculateEarnings(filteredOrders, filter)
@@ -50,7 +52,9 @@ const EarningsScreen: React.FC<Props> = ({ orders }) => {
          <SegmentedControl
             values={segments}
             selectedIndex={selectedIndex}
-            onChange={(event) => setSelectedIndex(event.nativeEvent.selectedSegmentIndex)}
+            onChange={(event) => {
+               setSelectedIndex(event.nativeEvent.selectedSegmentIndex)
+            }}
             style={styles.segmentedControl}
          />
          <ScrollView style={styles.scrollView}>
@@ -64,11 +68,10 @@ const EarningsScreen: React.FC<Props> = ({ orders }) => {
 
 const styles = StyleSheet.create({
    container: {
-      flex: 1,
-      padding: 16
+      flex: 1
    },
    segmentedControl: {
-      marginBottom: 16
+      marginVertical: 16
    },
    scrollView: {
       flex: 1

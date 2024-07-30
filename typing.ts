@@ -161,6 +161,11 @@ export interface BusinessDay {
    [key: string]: Day
 }
 
+export type EarningsData = {
+   day: string
+   totalTips: number
+}
+
 export type StoreCourierData = {
    id?: string
    businessId: string

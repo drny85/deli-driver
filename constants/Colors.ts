@@ -2,8 +2,8 @@ import { Dimensions } from 'react-native'
 import Constants from 'expo-constants'
 const { width, height } = Dimensions.get('window')
 export const Colors = {
-   primary: '#DEE9F7',
-   secondary: '#FBFFFF',
+   primary: '#FBFFFF',
+   secondary: '#DEE9F7',
    accent: '#B7C4DD',
    border: '#E2ECFD',
    main: '#7b2cbf',

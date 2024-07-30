@@ -175,6 +175,7 @@ const Login = () => {
                   <View style={{ width: '60%' }}>
                      <Button
                         disabled={isSubmitting}
+                        contentContainerStyle={{ borderRadius: SIZES.lg }}
                         title="Login"
                         onPress={handleSubmit(handleLogin)}
                      />
