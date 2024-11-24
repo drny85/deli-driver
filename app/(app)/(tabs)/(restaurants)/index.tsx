@@ -126,13 +126,13 @@ const Restaurants = () => {
                            }}
                            selectedIndex={option}
                            fontStyle={{
-                              fontSize: 20,
+                              fontSize: 18,
                               color: '#212121'
                            }}
                            tintColor={Colors.main}
                            activeFontStyle={{
                               color: '#ffffff',
-                              fontSize: 22
+                              fontSize: 20
                            }}
                            style={{
                               height: 40,

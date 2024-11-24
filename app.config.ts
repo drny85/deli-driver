@@ -12,6 +12,7 @@ const config: ExpoConfig = {
    slug: 'deli-driver',
    version: '1.0.0',
    scheme: 'deli-driver',
+   newArchEnabled: true,
    platforms: ['android', 'ios'],
    web: {
       bundler: 'metro',
@@ -43,9 +44,7 @@ const config: ExpoConfig = {
 
    orientation: 'portrait',
    icon: './assets/icon.png',
-
    userInterfaceStyle: 'light',
-
    splash: {
       image: './assets/splash.png',
       resizeMode: 'contain',

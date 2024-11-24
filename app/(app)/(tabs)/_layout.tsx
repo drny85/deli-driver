@@ -11,7 +11,7 @@ export default function TabLayout() {
    if (loading) return null
 
    if (!user || !user.isActive) {
-      return <Redirect href={'/(auth)/login'} />
+      return <Redirect href={'/login'} />
    }
 
    // if (!user && backgroundPermission?.granted) return <Redirect href={'/(auth)/login'} />

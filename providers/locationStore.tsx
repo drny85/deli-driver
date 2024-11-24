@@ -22,10 +22,14 @@ export const useLocatioStore = create<LocationStore>()(
                const userRef = doc(usersCollection, user.uid)
                const userData = await getDoc(userRef)
                const data = userData.data()
-               // if (userData.exists()) {
-               //    console.log('Updating user location')
-               //    await updateCourier({ ...data!, coords })
-               // }
+               if (userData.exists() && data && coords) {
+                  console.log(coords)
+                  console.log('Updating user location')
+                  await updateCourier({
+                     ...data,
+                     coords: { latitude: coords.latitude, longitude: coords.longitude }
+                  })
+               }
             }
             set({ location: coords })
          },

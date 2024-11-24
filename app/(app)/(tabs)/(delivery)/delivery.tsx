@@ -14,7 +14,7 @@ import { router, Stack, useLocalSearchParams } from 'expo-router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Alert, FlatList, ListRenderItem, Text, TouchableOpacity, View } from 'react-native'
 
-const ORDER_OPTIONS = ['New Orders', 'Pending', 'Current']
+const ORDER_OPTIONS = ['New', 'Pending', 'Current']
 
 type PropsParams = {
    index: string
@@ -24,6 +24,7 @@ const Deliveries = () => {
    const { user, loading } = useUser()
    const { orders: data } = useOrdersStore()
    const { index } = useLocalSearchParams<PropsParams>()
+   console.log('INDEX =>', index)
 
    const [option, setOption] = useState(0)
 
@@ -62,7 +63,7 @@ const Deliveries = () => {
                   ])
                   return
                }
-               router.push({ pathname: '/(maps)/maps', params: { orderId: item.id! } })
+               router.push({ pathname: '/maps', params: { orderId: item.id! } })
             }}
          />
       )
@@ -78,9 +79,9 @@ const Deliveries = () => {
 
    if (loading) return <Loading />
 
-   if (!user?.isOnline) {
-      return <GoOnline onPress={onOnlinePress} />
-   }
+   // if (!user?.isOnline) {
+   //    return <GoOnline onPress={onOnlinePress} />
+   // }
 
    return (
       <View style={{ flex: 1, backgroundColor: Colors.primary }}>
@@ -97,38 +98,35 @@ const Deliveries = () => {
                           return (
                              <TouchableOpacity
                                 style={{ padding: SIZES.sm }}
-                                onPress={() => router.push('/(maps)/nextOrder')}>
+                                onPress={() => router.push('/nextOrder')}>
                                 <FontAwesome name="filter" size={24} />
                              </TouchableOpacity>
                           )
                        }
-                     : undefined,
-               headerTitle: (props) => {
-                  return (
-                     <View {...props} style={{ width: '86%' }}>
-                        <SegmentedControl
-                           values={ORDER_OPTIONS}
-                           onChange={(event) => {
-                              setOption(event.nativeEvent.selectedSegmentIndex)
-                           }}
-                           selectedIndex={option}
-                           tintColor={Colors.main}
-                           activeFontStyle={{ color: '#ffffff', fontWeight: '700' }}
-                           style={{ height: 38 }}
-                        />
-                     </View>
-                  )
-               }
+                     : undefined
             }}
          />
          <View style={{ flex: 1, paddingHorizontal: SIZES.md }}>
+            <View style={{ width: '100%', height: 40 }}>
+               <SegmentedControl
+                  values={ORDER_OPTIONS}
+                  onChange={(event) => {
+                     setOption(event.nativeEvent.selectedSegmentIndex)
+                  }}
+                  selectedIndex={option}
+                  tintColor={Colors.main}
+                  fontStyle={{ fontSize: 16 }}
+                  activeFontStyle={{ color: '#ffffff', fontWeight: '700', fontSize: 18 }}
+                  style={{ height: 40 }}
+               />
+            </View>
             <FlatList
                scrollEnabled={false}
                data={ordersToRender}
                renderItem={renderOrders}
                ListEmptyComponent={() => (
                   <View style={{ marginTop: 60 }}>
-                     <Text style={{ textAlign: 'center', fontSize: 22 }}>No orders</Text>
+                     <Text style={{ textAlign: 'center', fontSize: 22 }}>No Deliveries</Text>
                   </View>
                )}
                contentContainerStyle={{ gap: SIZES.md, marginTop: SIZES.md }}

@@ -13,7 +13,7 @@ const AuthLayout = () => {
 
    if (user && user.emailVerified && user.type === 'courier' && user.isActive) {
       console.log('ONBOARDING COMPLETED')
-      return <Redirect href={'/(tabs)/(home)'} />
+      return <Redirect href={'/(app)/(tabs)/(home)'} />
    }
 
    return (

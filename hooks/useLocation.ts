@@ -80,7 +80,7 @@ export const useBackgroundLocation = () => {
          } else {
             setBackgroundPermission(true)
             console.log('Permission to access location granted', resb.status)
-            router.replace('/(tabs)')
+            router.replace('/(app)/(tabs)/(home)')
          }
       } catch (error) {
          console.log(error)

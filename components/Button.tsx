@@ -17,7 +17,7 @@ type ButtonProps = {
    contentTextStyle?: TextStyle
 } & TouchableOpacityProps
 
-export const Button = forwardRef<TouchableOpacity, ButtonProps>(
+export const Button = forwardRef<any, ButtonProps>(
    ({ onPress, title, contentContainerStyle, contentTextStyle }, ref) => {
       return (
          <NeoView
@@ -40,12 +40,12 @@ const styles = StyleSheet.create({
    button: {
       alignItems: 'center',
       backgroundColor: Colors.main,
-      borderRadius: 24,
+      borderRadius: 30,
       elevation: 5,
       flexDirection: 'row',
       justifyContent: 'center',
       padding: 16,
-      shadowColor: 'rbga(0,0,0,0.3)',
+      shadowColor: 'rbga(0,0,0,0.7)',
       shadowOffset: {
          height: 2,
          width: 0

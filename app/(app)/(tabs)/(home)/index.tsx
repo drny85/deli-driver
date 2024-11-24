@@ -11,11 +11,14 @@ import dayjs from 'dayjs'
 import { router } from 'expo-router'
 import * as Animatable from 'react-native-animatable'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { useBackgroundLocation } from '@/hooks/useLocation'
 
 const Home = () => {
    const { user } = useUser()
+   const { getForgroundLocation } = useBackgroundLocation()
+
    const orders = useOrdersStore((state) =>
       state.orders.filter(
          (o) =>
@@ -37,6 +40,10 @@ const Home = () => {
       () => orders.filter((o) => o.status === ORDER_STATUS.picked_up_by_driver),
       [orders]
    )[0]
+
+   useEffect(() => {
+      getForgroundLocation()
+   }, [])
    return (
       <Container>
          <View style={styles.container}>
@@ -46,7 +53,7 @@ const Home = () => {
                   <Animatable.Text
                      onPress={() =>
                         router.push({
-                           pathname: '/(maps)/maps',
+                           pathname: '/maps',
                            params: { orderId: currentOrder.id }
                         })
                      }
@@ -58,7 +65,7 @@ const Home = () => {
                   </Animatable.Text>
                </View>
             )}
-            <TouchableOpacity onPress={() => router.push('/(delivery)/delivery')}>
+            <TouchableOpacity onPress={() => router.push('/delivery')}>
                <NeoView
                   outterContainerStyles={{ borderRadius: SIZES.md }}
                   containerStyle={{ borderRadius: SIZES.md, padding: SIZES.sm }}>

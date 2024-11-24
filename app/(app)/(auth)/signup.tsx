@@ -164,6 +164,7 @@ const Signup = () => {
                                  onPress={() => setShowPassword((prev) => !prev)}
                                  name={showPassword ? 'eye-slash' : 'eye'}
                                  size={20}
+                                 color={Colors.main}
                               />
                            }
                         />
@@ -197,6 +198,10 @@ const Signup = () => {
                      <Button
                         disabled={isSubmitting}
                         title="Sign Up"
+                        contentContainerStyle={{
+                           borderRadius: SIZES.lg * 2,
+                           shadowColor: 'transparent'
+                        }}
                         onPress={handleSubmit(handleLogin)}
                      />
                   </View>

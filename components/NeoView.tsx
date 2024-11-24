@@ -47,23 +47,17 @@ const styles = StyleSheet.create({
       borderWidth: 0.8
    },
    topShadow: {
-      shadowOffset: {
-         width: -2,
-         height: -4
-      },
-      shadowColor: 'lightgrey',
       backgroundColor: Colors.primary,
-      shadowOpacity: 1,
-      shadowRadius: 4
+      borderRadius: 30,
+      boxShadow: '2px 5px 1px rbga(0,0,0,0.3)'
    },
    bottomShadow: {
       shadowOffset: {
          width: 2,
          height: 6
       },
-      shadowColor: Colors.accent,
-      backgroundColor: Colors.accent,
-      shadowOpacity: 1,
-      shadowRadius: 4
+      boxShadow: '2px 5px 1px rbga(0,0,0,0.3)',
+      borderRadius: 30,
+      backgroundColor: Colors.accent
    }
 })

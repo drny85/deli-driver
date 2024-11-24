@@ -17,12 +17,13 @@ import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet'
 import Constants from 'expo-constants'
 import { router, useLocalSearchParams } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Alert, StyleSheet, Text, View } from 'react-native'
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker, Region } from 'react-native-maps'
 import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-directions'
 import openMap from 'react-native-open-maps'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 import OTP from './otp'
+import { Sheet, useSheetRef } from '@/components/Sheet'
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || ''
 
@@ -35,6 +36,8 @@ let timeOut: NodeJS.Timeout
 
 const Maps = () => {
    const mapViewRef = useRef<MapView>(null)
+   const snapshots = useMemo(() => ['20%', '55%', '80%'], [])
+   const bottomSheetRef = useSheetRef()
    const { startLocationTracking } = useBackgroundLocation()
    const { orderId } = useLocalSearchParams<{ orderId: string }>()
    const location = useLocatioStore((state) => state.location)
@@ -66,8 +69,6 @@ const Maps = () => {
       longitude: -73.90275
    })
 
-   const snapshots = useMemo(() => ['20%', '55%', '80%'], [])
-   const bottomSheetRef = useRef<BottomSheet>(null)
    const waypoints = useMemo(
       () =>
          origin && business?.coords && order?.status === ORDER_STATUS.marked_ready_for_delivery
@@ -76,11 +77,12 @@ const Maps = () => {
       [origin, business, order.status]
    )
 
-   const onMapChange = (chnages: MapDirectionsResponse) => {
-      const { distance, duration } = chnages
+   const onMapChange = (changes: MapDirectionsResponse) => {
+      const { distance, duration } = changes
       setDistance(distance)
       setDuration(duration)
-      if (duration < 0.4) {
+      console.log('Distance: ', distance)
+      if (duration > 0.4) {
          bottomSheetRef.current?.snapToIndex(2)
       }
       if (order.status === ORDER_STATUS.picked_up_by_driver) {
@@ -144,7 +146,7 @@ const Maps = () => {
             })
          ])
 
-         router.replace('/(maps)/nextOrder')
+         router.replace('/nextOrder')
       } catch (error) {
          console.log(error)
       }
@@ -237,6 +239,7 @@ const Maps = () => {
       if (order.status === ORDER_STATUS.accepted_by_driver) {
          mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant'])
       }
+      bottomSheetRef.current?.present()
 
       return () => timeOut && clearTimeout(timeOut)
    }, [location, order, business?.coords])
@@ -334,10 +337,14 @@ const Maps = () => {
             </MapView>
          )}
 
-         <BottomSheet
+         <Sheet
             ref={bottomSheetRef}
             snapPoints={snapshots}
+            backdropComponent={() => null}
             backgroundStyle={{ backgroundColor: Colors.white }}
+            style={{ borderRadius: SIZES.lg, overflow: 'hidden' }}
+            handleHeight={40}
+            handleStyle={{ backgroundColor: Colors.white, width: '100%' }}
             onChange={(change) => {
                if (change === 1) {
                   height.value = withTiming(0.55)
@@ -349,7 +356,7 @@ const Maps = () => {
             }}
             index={0}
             handleIndicatorStyle={{ backgroundColor: Colors.main }}>
-            <BottomSheetScrollView
+            <ScrollView
                contentContainerStyle={{ backgroundColor: Colors.white, padding: SIZES.md }}>
                <Row align="evenly">
                   <ETA title={distance.toFixed(2)} subtitle="miles" />
@@ -389,8 +396,8 @@ const Maps = () => {
                      onPress={onActionPress}
                   />
                </View>
-            </BottomSheetScrollView>
-         </BottomSheet>
+            </ScrollView>
+         </Sheet>
          <OTP
             title="Delivery PIN"
             extraInfo={`Order # ${order.orderNumber}`}
