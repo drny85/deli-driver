@@ -1,5 +1,6 @@
 import { TabBarIcon } from '@/components/TabBarIcon'
 import { Colors } from '@/constants/Colors'
+import { useDriverLocation } from '@/hooks/useDriverLocation'
 import { useOrders } from '@/hooks/useOrders'
 import { useUser } from '@/hooks/useUser'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
@@ -8,6 +9,13 @@ import { Redirect, Tabs } from 'expo-router'
 export default function TabLayout() {
    const { loading, user } = useUser()
    useOrders()
+   useDriverLocation(user?.id!, (location) => {
+      if (location) {
+         console.log('Location Updated', location)
+      } else {
+         console.log('Location Not Updated')
+      }
+   })
    if (loading) return null
 
    if (!user || !user.isActive) {
@@ -28,10 +36,9 @@ export default function TabLayout() {
             headerStyle: {
                backgroundColor: Colors.primary
             }
-         }}
-         initialRouteName="(home)">
+         }}>
          <Tabs.Screen
-            name="(home)"
+            name="index"
             options={{
                title: 'Home',
                headerShown: false,
@@ -39,7 +46,7 @@ export default function TabLayout() {
             }}
          />
          <Tabs.Screen
-            name="(delivery)"
+            name="deliveries"
             options={{
                title: 'Deliveries',
                tabBarIcon: ({ color, size }) => (
@@ -48,17 +55,16 @@ export default function TabLayout() {
             }}
          />
          <Tabs.Screen
-            name="(restaurants)"
+            name="restaurants"
             options={{
-               title: 'Restaurants',
-               headerShown: false,
+               title: 'Businesses',
                tabBarIcon: ({ color, size }) => (
                   <Ionicons name="restaurant-outline" size={size} color={color} />
                )
             }}
          />
          <Tabs.Screen
-            name="(settings)"
+            name="settings"
             options={{
                title: 'Settings',
                headerShown: false,

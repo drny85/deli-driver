@@ -13,11 +13,12 @@ import * as Animatable from 'react-native-animatable'
 
 import { useEffect, useMemo } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { useBackgroundLocation } from '@/hooks/useLocation'
+import { useDriverLocation } from '@/hooks/useDriverLocation'
 
 const Home = () => {
    const { user } = useUser()
-   const { getForgroundLocation } = useBackgroundLocation()
+
+   // const { getForgroundLocation } = useBackgroundLocation()
 
    const orders = useOrdersStore((state) =>
       state.orders.filter(
@@ -41,9 +42,7 @@ const Home = () => {
       [orders]
    )[0]
 
-   useEffect(() => {
-      getForgroundLocation()
-   }, [])
+   useEffect(() => {}, [])
    return (
       <Container>
          <View style={styles.container}>
@@ -65,7 +64,7 @@ const Home = () => {
                   </Animatable.Text>
                </View>
             )}
-            <TouchableOpacity onPress={() => router.push('/delivery')}>
+            <TouchableOpacity onPress={() => router.push('/deliveries')}>
                <NeoView
                   outterContainerStyles={{ borderRadius: SIZES.md }}
                   containerStyle={{ borderRadius: SIZES.md, padding: SIZES.sm }}>

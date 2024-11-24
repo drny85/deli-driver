@@ -49,14 +49,14 @@ const styles = StyleSheet.create({
    topShadow: {
       backgroundColor: Colors.primary,
       borderRadius: 30,
-      boxShadow: '2px 5px 1px rbga(0,0,0,0.3)'
+      boxShadow: '-1px 5px 3px 0px rgba(184,171,184,0.53)'
    },
    bottomShadow: {
       shadowOffset: {
          width: 2,
          height: 6
       },
-      boxShadow: '2px 5px 1px rbga(0,0,0,0.3)',
+      boxShadow: '-1px 3px 3px 0px rgba(184,171,184,0.53)',
       borderRadius: 30,
       backgroundColor: Colors.accent
    }

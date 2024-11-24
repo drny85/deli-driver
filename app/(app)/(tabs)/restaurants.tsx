@@ -11,7 +11,6 @@ import { useNavigationSearch } from '@/hooks/useNavigationSeach'
 import { useUser } from '@/hooks/useUser'
 import { Business } from '@/typing'
 import SegmentedControl from '@react-native-segmented-control/segmented-control'
-import { Stack } from 'expo-router'
 import { useMemo, useState } from 'react'
 import {
    ActivityIndicator,
@@ -111,41 +110,31 @@ const Restaurants = () => {
    if (isLoading || loadingList) return <Loading />
    return (
       <View style={{ flex: 1, backgroundColor: Colors.primary }}>
-         <Stack.Screen
-            key={option}
-            options={{
-               title: 'Businesses',
-
-               headerTitle(props) {
-                  return (
-                     <View {...props} style={{ width: '100%' }}>
-                        <SegmentedControl
-                           values={OPTIONS}
-                           onChange={(event) => {
-                              setOption(event.nativeEvent.selectedSegmentIndex)
-                           }}
-                           selectedIndex={option}
-                           fontStyle={{
-                              fontSize: 18,
-                              color: '#212121'
-                           }}
-                           tintColor={Colors.main}
-                           activeFontStyle={{
-                              color: '#ffffff',
-                              fontSize: 20
-                           }}
-                           style={{
-                              height: 40,
-                              width: '70%',
-                              alignSelf: 'center',
-                              alignItems: 'center'
-                           }}
-                        />
-                     </View>
-                  )
-               }
-            }}
-         />
+         <View style={{ width: '100%' }}>
+            <SegmentedControl
+               values={OPTIONS}
+               onChange={(event) => {
+                  setOption(event.nativeEvent.selectedSegmentIndex)
+               }}
+               selectedIndex={option}
+               fontStyle={{
+                  fontSize: 18,
+                  color: '#212121'
+               }}
+               tintColor={Colors.main}
+               activeFontStyle={{
+                  color: '#ffffff',
+                  fontSize: 20
+               }}
+               style={{
+                  height: 40,
+                  width: '70%',
+                  marginVertical: SIZES.sm,
+                  alignSelf: 'center',
+                  alignItems: 'center'
+               }}
+            />
+         </View>
          <ScrollView contentInsetAdjustmentBehavior="automatic">
             <FlatList
                scrollEnabled={false}

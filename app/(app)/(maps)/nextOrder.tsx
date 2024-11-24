@@ -27,7 +27,7 @@ const NextOrder = () => {
          })
          if (!nextOrder) return
 
-         router.push({ pathname: '/(maps)/maps', params: { orderId: nextOrder?.id } })
+         router.push({ pathname: '/maps', params: { orderId: nextOrder?.id } })
       } catch (error) {
          console.log(error)
       }
@@ -35,7 +35,7 @@ const NextOrder = () => {
 
    useEffect(() => {
       if (moreOrders.length === 0) {
-         router.replace('/(tabs)/(home)')
+         router.replace('/(app)/(tabs)')
       }
    }, [moreOrders])
 
@@ -44,7 +44,7 @@ const NextOrder = () => {
          <Text style={{ textAlign: 'center', fontSize: 20 }}>{moreOrders.length} remaining</Text>
          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: SIZES.lg }}>
             <Text>nextOrder</Text>
-            <Button title="All Orders" onPress={() => router.push('/(tabs)/(home)')} />
+            <Button title="All Orders" onPress={() => router.push('/(app)/(tabs)')} />
             {moreOrders.length > 0 && <Button title="Next Order" onPress={handleNextOrder} />}
          </View>
       </Container>

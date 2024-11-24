@@ -2,6 +2,7 @@ import { updateCourier } from '@/actions/user/createCourier'
 
 import GoOnline from '@/components/GoOnline'
 import Loading from '@/components/Loading'
+import NeoView from '@/components/NeoView'
 import OrderListItem from '@/components/OrderListItem'
 import { Colors, SIZES } from '@/constants/Colors'
 import { useUser } from '@/hooks/useUser'
@@ -24,7 +25,6 @@ const Deliveries = () => {
    const { user, loading } = useUser()
    const { orders: data } = useOrdersStore()
    const { index } = useLocalSearchParams<PropsParams>()
-   console.log('INDEX =>', index)
 
    const [option, setOption] = useState(0)
 
@@ -38,6 +38,8 @@ const Deliveries = () => {
          console.log(error)
       }
    }, [user])
+
+   const in_progress = data.filter((o) => o.status === ORDER_STATUS.picked_up_by_driver)
 
    const ordersToRender = useMemo(() => {
       const orders = data.filter((o) => o.status !== ORDER_STATUS.delivered)
@@ -87,7 +89,7 @@ const Deliveries = () => {
       <View style={{ flex: 1, backgroundColor: Colors.primary }}>
          <Stack.Screen
             options={{
-               title: 'Orders',
+               title: 'Deliveries',
                headerStyle: {
                   backgroundColor: Colors.primary
                },
@@ -132,6 +134,24 @@ const Deliveries = () => {
                contentContainerStyle={{ gap: SIZES.md, marginTop: SIZES.md }}
             />
          </View>
+         {in_progress.length > 0 && (
+            <View
+               style={{
+                  position: 'absolute',
+                  bottom: 10,
+                  right: 10,
+                  zIndex: 20
+               }}>
+               <TouchableOpacity
+                  onPress={() =>
+                     router.push({ pathname: '/maps', params: { orderId: in_progress[0].id } })
+                  }>
+                  <NeoView rounded size={50} containerStyle={{ backgroundColor: Colors.secondary }}>
+                     <FontAwesome name="location-arrow" size={28} color={Colors.main} />
+                  </NeoView>
+               </TouchableOpacity>
+            </View>
+         )}
       </View>
    )
 }

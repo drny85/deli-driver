@@ -7,13 +7,13 @@ import MapOrderDetails from '@/components/map/MapOrderDetails'
 import Row from '@/components/Row'
 import { Colors, SIZES } from '@/constants/Colors'
 import { useBusiness } from '@/hooks/useBusiness'
-import { useBackgroundLocation } from '@/hooks/useLocation'
+
 import { useAuth } from '@/providers/authProvider'
 import { useLocatioStore } from '@/providers/locationStore'
 import { useOrdersStore } from '@/providers/ordersStore'
 import { Coords, Order, ORDER_STATUS } from '@/typing'
 import { actionTitle } from '@/utils/actionTitle'
-import BottomSheet, { BottomSheetScrollView } from '@gorhom/bottom-sheet'
+
 import Constants from 'expo-constants'
 import { router, useLocalSearchParams } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -24,6 +24,7 @@ import openMap from 'react-native-open-maps'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 import OTP from './otp'
 import { Sheet, useSheetRef } from '@/components/Sheet'
+import { useDriverLocation } from '@/hooks/useDriverLocation'
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || ''
 
@@ -35,15 +36,19 @@ let DISTANCE = 0.1
 let timeOut: NodeJS.Timeout
 
 const Maps = () => {
+   const { updateUser, user } = useAuth()
+   const { orderId } = useLocalSearchParams<{ orderId: string }>()
+   const { getOrder, setOrders, orders, updateOrder } = useOrdersStore()
+   const order = getOrder(orderId!)
+   // useDriverLocation(user?.id!, (location) => {
+   //    console.log('Location: ', location)
+   // })
    const mapViewRef = useRef<MapView>(null)
    const snapshots = useMemo(() => ['20%', '55%', '80%'], [])
    const bottomSheetRef = useSheetRef()
-   const { startLocationTracking } = useBackgroundLocation()
-   const { orderId } = useLocalSearchParams<{ orderId: string }>()
+
    const location = useLocatioStore((state) => state.location)
-   const { getOrder, setOrders, orders, updateOrder } = useOrdersStore()
-   const { updateUser, user } = useAuth()
-   const order = getOrder(orderId!)
+
    const { business, loading } = useBusiness(order.businessId)
    const [show, setShow] = useState(false)
 
@@ -248,7 +253,6 @@ const Maps = () => {
       if (!order) {
          router.back()
       } else {
-         startLocationTracking()
       }
    }, [order])
 

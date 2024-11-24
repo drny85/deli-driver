@@ -24,7 +24,7 @@ export const useLocatioStore = create<LocationStore>()(
                const data = userData.data()
                if (userData.exists() && data && coords) {
                   console.log(coords)
-                  console.log('Updating user location')
+                  console.log('Updating user location from Location Store')
                   await updateCourier({
                      ...data,
                      coords: { latitude: coords.latitude, longitude: coords.longitude }
