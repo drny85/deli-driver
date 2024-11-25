@@ -1,5 +1,6 @@
 import { createCourier } from '@/actions/user/createCourier'
 import { auth, usersCollection } from '@/firebase'
+import { stopBackgroundLocationUpdates } from '@/hooks/useDriverLocation'
 import { Courier } from '@/typing'
 import {
    createUserWithEmailAndPassword,
@@ -103,6 +104,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
    const logOut = async () => {
       try {
          await signOut(auth)
+         await stopBackgroundLocationUpdates()
          setUser(null)
       } catch (error) {
          console.error('Sign out error:', error)

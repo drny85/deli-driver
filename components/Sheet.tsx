@@ -41,7 +41,7 @@ const Sheet = React.forwardRef<BottomSheetModal, SheetProps>(
       return (
          <BottomSheetModal
             ref={ref}
-            index={0}
+            index={index}
             backgroundStyle={
                backgroundStyle ?? {
                   backgroundColor: Colors.main

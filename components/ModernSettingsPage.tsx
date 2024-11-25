@@ -244,23 +244,6 @@ export default function ModernSettingsPage() {
                <View style={styles.section}>
                   <Text style={styles.sectionTitle}>Preferences</Text>
 
-                  <TouchableOpacity
-                     onPress={() => {
-                        // handle onPress
-                        router.push('/address')
-                     }}
-                     style={[styles.row]}>
-                     <View style={[styles.rowIcon, { backgroundColor: 'green' }]}>
-                        <SimpleLineIcons name="map" size={20} color="#ffffff" />
-                     </View>
-
-                     <Text style={styles.rowLabel}>Saved Addresses</Text>
-
-                     <View style={styles.rowSpacer} />
-
-                     <Feather color="#C6C6C6" name="chevron-right" size={20} />
-                  </TouchableOpacity>
-
                   <View style={[styles.row]}>
                      <View style={[styles.rowIcon, { backgroundColor: '#38C959' }]}>
                         <Feather color="#fff" name="bell" size={20} />
@@ -321,7 +304,7 @@ export default function ModernSettingsPage() {
                   <TouchableOpacity
                      onPress={() => {
                         // handle onPress
-                        router.push('/terms')
+                        //router.push('/terms')
                      }}
                      style={[styles.row]}>
                      <View style={[styles.rowIcon, { backgroundColor: 'royalblue' }]}>
@@ -337,7 +320,7 @@ export default function ModernSettingsPage() {
                   <TouchableOpacity
                      onPress={() => {
                         // handle onPress
-                        router.push('/privacy')
+                        //router.push('/privacy')
                      }}
                      style={[styles.row]}>
                      <View style={[styles.rowIcon, { backgroundColor: 'red' }]}>

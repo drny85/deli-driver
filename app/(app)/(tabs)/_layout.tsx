@@ -1,3 +1,4 @@
+import { updateDriverLocationInFirestore } from '@/actions/courier'
 import { TabBarIcon } from '@/components/TabBarIcon'
 import { Colors } from '@/constants/Colors'
 import { useDriverLocation } from '@/hooks/useDriverLocation'
@@ -12,6 +13,7 @@ export default function TabLayout() {
    useDriverLocation(user?.id!, (location) => {
       if (location) {
          console.log('Location Updated', location)
+         updateDriverLocationInFirestore(user?.id!, location)
       } else {
          console.log('Location Not Updated')
       }

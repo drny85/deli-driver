@@ -8,7 +8,7 @@ const filteredEnv = Object.fromEntries(
 // import { ExpoConfig } from '@expo/config-types';
 
 const config: ExpoConfig = {
-   name: 'deli-driver',
+   name: 'Deli Driver',
    slug: 'deli-driver',
    version: '1.0.0',
    scheme: 'deli-driver',
@@ -69,6 +69,7 @@ const config: ExpoConfig = {
          foregroundImage: './assets/adaptive-icon.png',
          backgroundColor: '#ffffff'
       },
+      permissions: ['ACCESS_FINE_LOCATION', 'ACCESS_COARSE_LOCATION', 'FOREGROUND_SERVICE'],
       package: 'com.robertdev.deli.driver'
    },
    extra: {

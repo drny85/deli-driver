@@ -2,6 +2,11 @@ import { Alert, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useAuth } from '@/providers/authProvider'
 import { updateCourier } from '@/actions/user/createCourier'
+import NeoView from './NeoView'
+import {
+   startBackgroundLocationUpdates,
+   stopBackgroundLocationUpdates
+} from '@/hooks/useDriverLocation'
 
 const OnlineToggleButton = () => {
    const { user } = useAuth()
@@ -23,16 +28,31 @@ const OnlineToggleButton = () => {
                   if (!user) return
                   // Handle the online/offline toggle logic here
                   updateCourier({ ...user, isOnline: !user?.isOnline })
+                  if (user.isOnline) {
+                     // send notification to all drivers that user is offline
+                     stopBackgroundLocationUpdates()
+                  } else {
+                     // send notification to all drivers that user is online
+                     startBackgroundLocationUpdates()
+                  }
                }
             }
          ]
       )
    }
-   return (
-      <TouchableOpacity onPress={handleOnlineToggle}>
-         <Text style={{ fontSize: 16, fontWeight: '500', color: 'grey' }}>
-            {user?.isOnline ? 'Go Offline' : 'Go Online'}
-         </Text>
+   return user?.isOnline ? (
+      <TouchableOpacity
+         style={{ alignSelf: 'flex-end', marginRight: 14 }}
+         onPress={handleOnlineToggle}>
+         <Text style={{ fontSize: 16, fontWeight: '500', color: 'grey' }}>Go Offline</Text>
+      </TouchableOpacity>
+   ) : (
+      <TouchableOpacity
+         onPress={handleOnlineToggle}
+         style={{ position: 'absolute', bottom: 12, right: 10, zIndex: 50 }}>
+         <NeoView rounded size={54}>
+            <Text style={{ fontSize: 22, fontWeight: '600' }}>Go</Text>
+         </NeoView>
       </TouchableOpacity>
    )
 }

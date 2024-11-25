@@ -19,12 +19,17 @@ import { router, useLocalSearchParams } from 'expo-router'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker, Region } from 'react-native-maps'
-import MapViewDirections, { MapDirectionsResponse } from 'react-native-maps-directions'
+import MapViewDirections, {
+   MapDirectionsResponse,
+   MapViewDirectionsMode
+} from 'react-native-maps-directions'
 import openMap from 'react-native-open-maps'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 import OTP from './otp'
 import { Sheet, useSheetRef } from '@/components/Sheet'
-import { useDriverLocation } from '@/hooks/useDriverLocation'
+import { startBackgroundLocationUpdates, useDriverLocation } from '@/hooks/useDriverLocation'
+import { listenToDriverLocation } from '@/actions/courier'
+import debounce from 'lodash.debounce'
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || ''
 
@@ -37,17 +42,18 @@ let timeOut: NodeJS.Timeout
 
 const Maps = () => {
    const { updateUser, user } = useAuth()
+   const [drivingMode, setDrivingMode] = useState<MapViewDirectionsMode>('DRIVING')
+   const [driverLocation, setDriverLocation] = useState<Coords | null>(null)
    const { orderId } = useLocalSearchParams<{ orderId: string }>()
    const { getOrder, setOrders, orders, updateOrder } = useOrdersStore()
    const order = getOrder(orderId!)
-   // useDriverLocation(user?.id!, (location) => {
+   const restaurant = order.address?.coords
+   // useDriverLocation(user?.id!, (location) => {a
    //    console.log('Location: ', location)
    // })
    const mapViewRef = useRef<MapView>(null)
-   const snapshots = useMemo(() => ['20%', '55%', '80%'], [])
+   const snapshots = useMemo(() => ['18%', '55%', '80%'], [])
    const bottomSheetRef = useSheetRef()
-
-   const location = useLocatioStore((state) => state.location)
 
    const { business, loading } = useBusiness(order.businessId)
    const [show, setShow] = useState(false)
@@ -61,25 +67,20 @@ const Maps = () => {
       longitude: -73.90453,
       ...DELTA
    })
-   const [origin, setOrigin] = useState<Coords | null>({
-      ...location!
-   })
+
    // const [destination, setDestination] = useState<Coords | null>({
    //   latitude: 40.85109,
    //   longitude: -73.89316,
    // });
 
-   const [restaurant, setRestaurant] = useState<Coords | null>({
-      latitude: 40.84738,
-      longitude: -73.90275
-   })
-
    const waypoints = useMemo(
       () =>
-         origin && business?.coords && order?.status === ORDER_STATUS.marked_ready_for_delivery
-            ? [origin, business.coords]
+         driverLocation &&
+         business?.coords &&
+         order?.status === ORDER_STATUS.marked_ready_for_delivery
+            ? [driverLocation, business.coords]
             : [],
-      [origin, business, order.status]
+      [driverLocation, business, order.status]
    )
 
    const onMapChange = (changes: MapDirectionsResponse) => {
@@ -87,13 +88,17 @@ const Maps = () => {
       setDistance(distance)
       setDuration(duration)
       console.log('Distance: ', distance)
-      if (duration > 0.4) {
+      if (distance < 1.3) {
+         setDrivingMode('WALKING')
+      }
+      if (duration < 0.4) {
          bottomSheetRef.current?.snapToIndex(2)
       }
       if (order.status === ORDER_STATUS.picked_up_by_driver) {
          // DISTANCE = distance;
       }
    }
+   startBackgroundLocationUpdates()
 
    const onActionPress = async () => {
       if (order?.status === ORDER_STATUS.marked_ready_for_delivery) {
@@ -106,7 +111,7 @@ const Maps = () => {
             ...user!,
             busy: true
          })
-
+         await startBackgroundLocationUpdates()
          router.back()
          return
       } else if (order?.status === ORDER_STATUS.accepted_by_driver) {
@@ -157,6 +162,29 @@ const Maps = () => {
       }
    }, [])
 
+   const updateCamera = debounce((location) => {
+      mapViewRef.current?.animateCamera({
+         center: location,
+         zoom: 15,
+         pitch: 45, // 3D tilt
+         heading: 0
+      })
+   }, 500) // Adjust delay based on requirements
+
+   useEffect(() => {
+      // Start listening to the driver's location in Firestore
+      if (!user?.id) return
+      const unsubscribe = listenToDriverLocation(user?.id!, (location) => {
+         console.log('Location from Firebase', location)
+         setDriverLocation(location)
+         // Animate the camera to the new location
+         updateCamera(location)
+      })
+
+      // Clean up the listener when the component unmounts
+      return () => unsubscribe()
+   }, [user?.id])
+
    // const order = useMemo(() => findUndeliveredOrder(orders, origin!), [orders]);
    // console.log(order);
 
@@ -194,7 +222,7 @@ const Maps = () => {
    // }));
 
    useEffect(() => {
-      if (!origin || !order) return
+      if (!driverLocation || !order) return
 
       // startLocationTracking();
       if (order.status === ORDER_STATUS.marked_ready_for_delivery) {
@@ -206,36 +234,6 @@ const Maps = () => {
                left: 20
             }
          })
-         // timeOut = setTimeout(() => {
-         //    mapViewRef.current?.animateToRegion({
-         //       ...origin,
-         //       ...DELTA
-         //    })
-         // }, 1500)
-         // timeOut = setTimeout(() => {
-         //    mapViewRef.current?.animateToRegion({
-         //       ...business?.coords!,
-         //       ...DELTA
-         //    })
-         // }, 3500)
-         // timeOut = setTimeout(() => {
-         //    mapViewRef.current?.animateToRegion({
-         //       ...order.address?.coords!,
-         //       ...DELTA
-         //    })
-         // }, 5500)
-         // timeOut = setTimeout(() => {
-         //    mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant', 'destination'], {
-         //       edgePadding: {
-         //          top: 30,
-         //          right: 30,
-         //          bottom: 50,
-         //          left: 30
-         //       }
-         //    })
-
-         //    bottomSheetRef.current?.snapToIndex(2, { duration: 500 })
-         // }, 7000)
       }
 
       if (order.status === ORDER_STATUS.picked_up_by_driver) {
@@ -247,7 +245,7 @@ const Maps = () => {
       bottomSheetRef.current?.present()
 
       return () => timeOut && clearTimeout(timeOut)
-   }, [location, order, business?.coords])
+   }, [driverLocation, order, business?.coords])
 
    useEffect(() => {
       if (!order) {
@@ -276,7 +274,7 @@ const Maps = () => {
                openGoogleMap()
             }}
          />
-         {origin && order.address?.coords && business?.coords && (
+         {driverLocation && order.address?.coords && business?.coords && (
             <MapView
                style={[styles.map]}
                mapPadding={{
@@ -291,11 +289,15 @@ const Maps = () => {
                initialRegion={initialRegion}
                region={initialRegion}
                showsUserLocation
+               userLocationPriority="high"
+               userLocationUpdateInterval={5000}
                followsUserLocation
                zoomTapEnabled
                showsPointsOfInterest={false}
                showsBuildings={false}>
-               {origin && <Marker coordinate={origin} title="Me" identifier="origin" />}
+               {driverLocation && (
+                  <Marker coordinate={{ ...driverLocation! }} title="Me" identifier="origin" />
+               )}
                {business &&
                   (order.status === ORDER_STATUS.marked_ready_for_delivery ||
                      order.status === ORDER_STATUS.accepted_by_driver) && (
@@ -313,36 +315,42 @@ const Maps = () => {
                   />
                )}
 
-               {origin && order && order.address.coords && restaurant && bottomSheetRef.current && (
-                  <MapViewDirections
-                     apikey={API_KEY}
-                     origin={origin}
-                     destination={
-                        order.status === ORDER_STATUS.marked_ready_for_delivery
-                           ? order.address.coords
-                           : order.status === ORDER_STATUS.accepted_by_driver
-                             ? business?.coords
-                             : order.address.coords
-                     }
-                     strokeWidth={3}
-                     strokeColor={Colors.main}
-                     onStart={(params) => {
-                        console.log(
-                           `Started routing between "${params.origin}" and "${params.destination}"`
-                        )
-                     }}
-                     waypoints={waypoints}
-                     onError={(err) => {
-                        console.log('Error getting Directions', err)
-                     }}
-                     onReady={onMapChange}
-                  />
-               )}
+               {driverLocation &&
+                  order &&
+                  order.address.coords &&
+                  restaurant &&
+                  bottomSheetRef.current && (
+                     <MapViewDirections
+                        apikey={API_KEY}
+                        mode={drivingMode}
+                        origin={driverLocation}
+                        destination={
+                           order.status === ORDER_STATUS.marked_ready_for_delivery
+                              ? order.address.coords
+                              : order.status === ORDER_STATUS.accepted_by_driver
+                                ? business?.coords
+                                : order.address.coords
+                        }
+                        strokeWidth={3}
+                        strokeColor={Colors.main}
+                        onStart={(params) => {
+                           console.log(
+                              `Started routing between "${params.origin}" and "${params.destination}"`
+                           )
+                        }}
+                        waypoints={waypoints}
+                        onError={(err) => {
+                           console.log('Error getting Directions', err)
+                        }}
+                        onReady={onMapChange}
+                     />
+                  )}
             </MapView>
          )}
 
          <Sheet
             ref={bottomSheetRef}
+            index={0}
             snapPoints={snapshots}
             backdropComponent={() => null}
             backgroundStyle={{ backgroundColor: Colors.white }}
@@ -358,7 +366,6 @@ const Maps = () => {
                   height.value = withTiming(0.2, { duration: 500 })
                }
             }}
-            index={0}
             handleIndicatorStyle={{ backgroundColor: Colors.main }}>
             <ScrollView
                contentContainerStyle={{ backgroundColor: Colors.white, padding: SIZES.md }}>

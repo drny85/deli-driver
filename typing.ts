@@ -34,6 +34,25 @@ export const statusList: OrderStatus[] = [
    'Picked By Courier',
    'Delivered'
 ]
+// Define the shape of location data
+export type LocationData = {
+   locations: {
+      coords: {
+         latitude: number
+         longitude: number
+         altitude: number
+         accuracy: number
+         speed: number
+         heading: number
+      }
+      timestamp: number
+   }[]
+}
+
+// Define the shape of potential errors
+export type TaskError = {
+   message: string
+}
 
 export interface Order {
    id?: string

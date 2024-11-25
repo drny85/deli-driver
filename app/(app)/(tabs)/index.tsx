@@ -14,6 +14,7 @@ import * as Animatable from 'react-native-animatable'
 import { useEffect, useMemo } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { useDriverLocation } from '@/hooks/useDriverLocation'
+import OnlineToggleButton from '@/components/OnlineToggleButton'
 
 const Home = () => {
    const { user } = useUser()
@@ -45,6 +46,8 @@ const Home = () => {
    useEffect(() => {}, [])
    return (
       <Container>
+         <OnlineToggleButton />
+
          <View style={styles.container}>
             {!user?.isOnline && <Text style={styles.offlineTitle}>You are Off-line</Text>}
             {currentOrder && (
