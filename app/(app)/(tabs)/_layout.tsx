@@ -1,7 +1,5 @@
-import { updateDriverLocationInFirestore } from '@/actions/courier'
 import { TabBarIcon } from '@/components/TabBarIcon'
 import { Colors } from '@/constants/Colors'
-import { useDriverLocation } from '@/hooks/useDriverLocation'
 import { useOrders } from '@/hooks/useOrders'
 import { useUser } from '@/hooks/useUser'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
@@ -10,14 +8,14 @@ import { Redirect, Tabs } from 'expo-router'
 export default function TabLayout() {
    const { loading, user } = useUser()
    useOrders()
-   useDriverLocation(user?.id!, (location) => {
-      if (location) {
-         console.log('Location Updated', location)
-         updateDriverLocationInFirestore(user?.id!, location)
-      } else {
-         console.log('Location Not Updated')
-      }
-   })
+   // useDriverLocation(user?.id!, (location) => {
+   //    if (location) {
+   //       console.log('Location Updated', location)
+   //       updateDriverLocationInFirestore(user?.id!, location)
+   //    } else {
+   //       console.log('Location Not Updated')
+   //    }
+   // })
    if (loading) return null
 
    if (!user || !user.isActive) {
@@ -51,6 +49,7 @@ export default function TabLayout() {
             name="deliveries"
             options={{
                title: 'Deliveries',
+
                tabBarIcon: ({ color, size }) => (
                   <MaterialIcons name="delivery-dining" size={size} color={color} />
                )

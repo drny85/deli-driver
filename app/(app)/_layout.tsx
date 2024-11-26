@@ -42,6 +42,7 @@ function RootLayout() {
          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
          <Stack.Screen name="(maps)" options={{ headerShown: false }} />
          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+         <Stack.Screen name="(modals)" options={{ headerShown: false }} />
          {/* <Stack.Screen name="notlocation" options={{ headerShown: false }} /> */}
          {/* <Stack.Screen
         name="quiz"

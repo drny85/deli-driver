@@ -2,7 +2,10 @@ import { useAuth } from '@/providers/authProvider'
 import * as Location from 'expo-location'
 import { useEffect } from 'react'
 import * as TaskManager from 'expo-task-manager'
+import * as Device from 'expo-device'
 import { LocationData } from '@/typing'
+import { useLocatioStore } from '@/providers/locationStore'
+import { distanceBetweenCoords } from '@/utils/distanceBetweenCoords'
 
 export const useDriverLocation = (
    courierId: string,
@@ -59,7 +62,17 @@ TaskManager.defineTask(LOCATION_TASK_NAME, ({ data, error }): any => {
       const location = locations[0]
 
       if (location) {
+         const oldLocation = useLocatioStore.getState().location
+         if (!oldLocation) return useLocatioStore.getState().setLocation(location.coords)
+
+         const diff = distanceBetweenCoords(oldLocation, location.coords)
+         console.log('DIFF', oldLocation, location.coords)
+         if (diff < 2) return
          console.log('Background location:', location)
+         if (Device.isDevice) {
+            console.log('UPDATED in REAL DEVICE')
+            useLocatioStore.getState().setLocation(location.coords)
+         }
 
          // Send the location to the server or Firestore
          //updateDriverLocation(location.coords);
@@ -80,9 +93,10 @@ export const startBackgroundLocationUpdates = async () => {
       console.log('Starting background location updates...')
       await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
          accuracy: Location.Accuracy.High,
-         distanceInterval: 10, // Update every 50 meters
+         distanceInterval: 30, // Update every 50 meters
          deferredUpdatesInterval: 1000 * 60, // Minimum time interval between updates (in ms)
-         showsBackgroundLocationIndicator: true // iOS only: shows the blue bar while tracking
+         showsBackgroundLocationIndicator: true
+         // iOS only: shows the blue bar while tracking
       })
    } else {
       console.log('Background location task already running.')

@@ -8,6 +8,13 @@ import * as Animatble from 'react-native-animatable'
 import { Container } from '@/components/Container'
 import NeoView from '@/components/NeoView'
 import { Colors, SIZES } from '@/constants/Colors'
+import Animated, {
+   SlideInDown,
+   SlideInRight,
+   SlideInUp,
+   SlideOutDown,
+   SlideOutRight
+} from 'react-native-reanimated'
 
 let TIME_OUT: NodeJS.Timeout | null = null
 
@@ -92,21 +99,17 @@ const OTP = ({ code, lenght, title, callBack, extraInfo, override, show, setShow
                   <View style={styles.digitsRow}>
                      {otp.map((digit, index) =>
                         showNumber ? (
-                           <MotiView
-                              key={index}
-                              from={{ opacity: 0, translateY: 10 }}
-                              animate={{ opacity: 1, translateY: 0 }}
-                              exit={{ opacity: 0, translateY: 10 }}>
-                              <Text
-                                 style={{
-                                    fontFamily: 'Genos-Bold',
-                                    fontSize: 26,
-                                    color: Colors.main
-                                 }}
-                                 key={index}>
-                                 {digit}
-                              </Text>
-                           </MotiView>
+                           <Animated.Text
+                              entering={SlideInRight.duration(300)}
+                              exiting={SlideOutRight.duration(300)}
+                              style={{
+                                 fontFamily: 'Genos-Bold',
+                                 fontSize: 40,
+                                 color: Colors.main
+                              }}
+                              key={index}>
+                              {digit}
+                           </Animated.Text>
                         ) : (
                            <MotiView
                               key={index}
@@ -224,7 +227,9 @@ const OTP = ({ code, lenght, title, callBack, extraInfo, override, show, setShow
                               setShow(false)
                            }
                         }}>
-                        <Text>Exit</Text>
+                        <Text style={{ fontSize: 18, fontWeight: '700', color: 'orange' }}>
+                           Exit
+                        </Text>
                      </TouchableOpacity>
                   </View>
                </Animatble.View>
@@ -250,7 +255,7 @@ const DIGIT = ({
    return (
       <TouchableOpacity disabled={otp?.length === lenght} onPress={onPress} activeOpacity={0.7}>
          <NeoView rounded size={80} outterContainerStyles={{ borderRadius: 999 }}>
-            <Text style={{ fontFamily: 'Genos-Bold', fontSize: 26, color: Colors.main }}>
+            <Text style={{ fontFamily: 'Genos-Bold', fontSize: 36, color: Colors.main }}>
                {value}
             </Text>
          </NeoView>

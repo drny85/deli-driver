@@ -8,7 +8,6 @@ type OrdersStore = {
    setOrders: (orders: Order[]) => void
    removeOrder: (order: Order) => void
    clearOrders: () => void
-
    updateOrder: (order: Order) => Promise<boolean>
    getOrder: (id: string) => Order
    getOrders: () => Order[]

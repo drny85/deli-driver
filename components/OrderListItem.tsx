@@ -1,6 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import { Order, ORDER_STATUS } from '@/typing'
+import { Order } from '@/typing'
 import { Colors, SIZES } from '@/constants/Colors'
 import NeoView from './NeoView'
 import Row from './Row'
@@ -21,8 +21,7 @@ const OrderListItem = ({ item, onPress }: Props) => {
             containerStyle={{
                padding: SIZES.sm,
                borderRadius: SIZES.sm,
-               backgroundColor:
-                  item.status === ORDER_STATUS.picked_up_by_driver ? Colors.accent : Colors.primary
+               backgroundColor: Colors.white
             }}>
             <Row align="between">
                <View style={{ gap: SIZES.sm }}>
@@ -42,5 +41,3 @@ const OrderListItem = ({ item, onPress }: Props) => {
 }
 
 export default OrderListItem
-
-const styles = StyleSheet.create({})

@@ -94,6 +94,15 @@ const Deliveries = () => {
                   backgroundColor: Colors.primary
                },
                headerShadowVisible: false,
+               headerLeft: () => {
+                  return (
+                     <TouchableOpacity
+                        onPress={() => router.push('/mydeliveries')}
+                        style={{ marginLeft: SIZES.md }}>
+                        <Text style={{ fontWeight: 600, fontSize: 18 }}>View All</Text>
+                     </TouchableOpacity>
+                  )
+               },
                headerRight:
                   ordersToRender.length > 0
                      ? () => {

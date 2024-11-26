@@ -1,3 +1,4 @@
+import { updateDriverLocationInFirestore } from '@/actions/courier'
 import { updateCourier } from '@/actions/user/createCourier'
 import { auth, usersCollection } from '@/firebase'
 import { Coords } from '@/typing'
@@ -23,12 +24,12 @@ export const useLocatioStore = create<LocationStore>()(
                const userData = await getDoc(userRef)
                const data = userData.data()
                if (userData.exists() && data && coords) {
-                  console.log(coords)
                   console.log('Updating user location from Location Store')
                   await updateCourier({
                      ...data,
                      coords: { latitude: coords.latitude, longitude: coords.longitude }
                   })
+                  updateDriverLocationInFirestore(user.uid, coords)
                }
             }
             set({ location: coords })

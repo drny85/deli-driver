@@ -1,4 +1,5 @@
 import { db } from '@/firebase'
+import { setLocation } from '@/providers/locationStore'
 import { Coords } from '@/typing'
 import { doc, setDoc, onSnapshot } from 'firebase/firestore'
 
@@ -22,6 +23,7 @@ export const listenToDriverLocation = (
          const data = doc.data()
          if (data.location) {
             onLocationUpdate(data.location)
+            setLocation(data.location)
          }
       }
    })

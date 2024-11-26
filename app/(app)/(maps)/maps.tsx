@@ -27,7 +27,7 @@ import openMap from 'react-native-open-maps'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 import OTP from './otp'
 import { Sheet, useSheetRef } from '@/components/Sheet'
-import { startBackgroundLocationUpdates, useDriverLocation } from '@/hooks/useDriverLocation'
+import { startBackgroundLocationUpdates } from '@/hooks/useDriverLocation'
 import { listenToDriverLocation } from '@/actions/courier'
 import debounce from 'lodash.debounce'
 
@@ -52,7 +52,7 @@ const Maps = () => {
    //    console.log('Location: ', location)
    // })
    const mapViewRef = useRef<MapView>(null)
-   const snapshots = useMemo(() => ['18%', '55%', '80%'], [])
+   const snapshots = useMemo(() => ['18%', '65%', '80%'], [])
    const bottomSheetRef = useSheetRef()
 
    const { business, loading } = useBusiness(order.businessId)
@@ -87,18 +87,18 @@ const Maps = () => {
       const { distance, duration } = changes
       setDistance(distance)
       setDuration(duration)
-      console.log('Distance: ', distance)
+      console.log('Distance: => ', distance)
       if (distance < 1.3) {
          setDrivingMode('WALKING')
       }
-      if (duration < 0.4) {
+      if (distance < 0.6) {
+         console.log('Opening: ', duration)
          bottomSheetRef.current?.snapToIndex(2)
       }
       if (order.status === ORDER_STATUS.picked_up_by_driver) {
          // DISTANCE = distance;
       }
    }
-   startBackgroundLocationUpdates()
 
    const onActionPress = async () => {
       if (order?.status === ORDER_STATUS.marked_ready_for_delivery) {
@@ -163,6 +163,7 @@ const Maps = () => {
    }, [])
 
    const updateCamera = debounce((location) => {
+      if (order.status === ORDER_STATUS.marked_ready_for_delivery) return
       mapViewRef.current?.animateCamera({
          center: location,
          zoom: 15,
@@ -269,6 +270,7 @@ const Maps = () => {
                      left: 30
                   }
                })
+               bottomSheetRef.current?.present()
             }}
             onPress={() => {
                openGoogleMap()
@@ -355,8 +357,7 @@ const Maps = () => {
             backdropComponent={() => null}
             backgroundStyle={{ backgroundColor: Colors.white }}
             style={{ borderRadius: SIZES.lg, overflow: 'hidden' }}
-            handleHeight={40}
-            handleStyle={{ backgroundColor: Colors.white, width: '100%' }}
+            handleStyle={{ backgroundColor: Colors.primary, width: '100%', height: 50 }}
             onChange={(change) => {
                if (change === 1) {
                   height.value = withTiming(0.55)
