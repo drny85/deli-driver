@@ -1,7 +1,7 @@
 import { createCourier } from '@/actions/user/createCourier'
 import { auth, usersCollection } from '@/firebase'
-import { stopBackgroundLocationUpdates } from '@/hooks/useDriverLocation'
 import { Courier } from '@/typing'
+import { stopBackgroundLocationUpdates } from '@/utils/location'
 import {
    createUserWithEmailAndPassword,
    onAuthStateChanged,

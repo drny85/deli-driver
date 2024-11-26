@@ -8,13 +8,7 @@ import * as Animatble from 'react-native-animatable'
 import { Container } from '@/components/Container'
 import NeoView from '@/components/NeoView'
 import { Colors, SIZES } from '@/constants/Colors'
-import Animated, {
-   SlideInDown,
-   SlideInRight,
-   SlideInUp,
-   SlideOutDown,
-   SlideOutRight
-} from 'react-native-reanimated'
+import Animated, { SlideInRight, SlideOutRight } from 'react-native-reanimated'
 
 let TIME_OUT: NodeJS.Timeout | null = null
 

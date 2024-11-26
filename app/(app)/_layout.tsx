@@ -6,6 +6,7 @@ import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { useCallback } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { useCourierNotification } from '@/hooks/useCourrierNotification'
 SplashScreen.preventAutoHideAsync()
 
 export const unstable_settings = {
@@ -37,6 +38,7 @@ export default function App() {
 // You can explore the built-in icon families and icons on the web at XXXXXXXXXXXXXXXXXXXXXXX
 
 function RootLayout() {
+   useCourierNotification()
    return (
       <Stack screenOptions={{ animation: 'slide_from_bottom' }} initialRouteName="(tabs)">
          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

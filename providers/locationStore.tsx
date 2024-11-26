@@ -1,4 +1,4 @@
-import { updateDriverLocationInFirestore } from '@/actions/courier'
+import { updateDriverLocationInFirestore } from '@/actions/courier/updateDriverLocationInFirestore'
 import { updateCourier } from '@/actions/user/createCourier'
 import { auth, usersCollection } from '@/firebase'
 import { Coords } from '@/typing'
@@ -44,6 +44,3 @@ export const useLocatioStore = create<LocationStore>()(
       }
    )
 )
-
-export const location = useLocatioStore.getState().getLocation()
-export const setLocation = useLocatioStore.getState().setLocation

@@ -27,9 +27,9 @@ import openMap from 'react-native-open-maps'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 import OTP from './otp'
 import { Sheet, useSheetRef } from '@/components/Sheet'
-import { startBackgroundLocationUpdates } from '@/hooks/useDriverLocation'
 import { listenToDriverLocation } from '@/actions/courier'
 import debounce from 'lodash.debounce'
+import { startBackgroundLocationUpdates } from '@/utils/location'
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || ''
 

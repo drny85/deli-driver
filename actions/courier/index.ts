@@ -1,16 +1,7 @@
 import { db } from '@/firebase'
-import { setLocation } from '@/providers/locationStore'
+import { useLocatioStore } from '@/providers/locationStore'
 import { Coords } from '@/typing'
-import { doc, setDoc, onSnapshot } from 'firebase/firestore'
-
-export const updateDriverLocationInFirestore = async (courierId: string, location: Coords) => {
-   const driverRef = doc(db, 'drivers', courierId)
-   try {
-      await setDoc(driverRef, { location }, { merge: true })
-   } catch (error) {
-      console.log('Error updating locations', error)
-   }
-}
+import { doc, onSnapshot } from 'firebase/firestore'
 
 export const listenToDriverLocation = (
    courierId: string,
@@ -23,7 +14,7 @@ export const listenToDriverLocation = (
          const data = doc.data()
          if (data.location) {
             onLocationUpdate(data.location)
-            setLocation(data.location)
+            useLocatioStore.getState().setLocation(data.location)
          }
       }
    })

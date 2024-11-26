@@ -26,7 +26,7 @@ const DeliveryDetails = () => {
 
    return (
       <Container>
-         <Text style={styles.title}>Order's Details</Text>
+         <Text style={styles.title}>Delivery's Details</Text>
          <ScrollView contentContainerStyle={{ padding: SIZES.md }}>
             <View style={{ gap: SIZES.sm }}>
                <Text style={styles.text}>
@@ -79,7 +79,7 @@ const DeliveryDetails = () => {
             </View>
             {order.deliveryInstructions && (
                <View style={styles.innerContainer}>
-                  <Text style={{ fontWeight: 'bold' }}>Delivery Instruction:</Text>
+                  <Text style={{ fontWeight: 'bold' }}>Delivery Instructions:</Text>
                   <Text style={styles.text}>{order.deliveryInstructions}</Text>
                </View>
             )}

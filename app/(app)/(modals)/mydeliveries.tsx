@@ -20,10 +20,12 @@ const OPTIONS = ['WTD', 'MTD', 'ALL']
 
 const MyDeliveries = () => {
    const [selectedIndex, setSelectedIndex] = useState(0)
-   const orders = useOrdersStore((s) => s.orders.filter((order) => order.status === 'delivered'))
+   const orders = useOrdersStore((s) =>
+      s.orders.filter((order) => order.status === 'delivered')
+   ).sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
    const search = useNavigationSearch({
       searchBarOptions: {
-         placeholder: 'Search Deliveries'
+         placeholder: "Search by address, customer's mane"
       }
    })
    const data = useMemo(() => {
@@ -46,6 +48,10 @@ const MyDeliveries = () => {
          return orders
       }
    }, [orders])
+   const total =
+      useMemo(() => {
+         return data.reduce((acc, order) => acc + order.tip?.amount!, 0)
+      }, [data]) || 0
 
    const renderOrders: ListRenderItem<Order> = ({ item }) => (
       <TouchableOpacity
@@ -70,6 +76,15 @@ const MyDeliveries = () => {
             activeFontStyle={{ color: 'white', fontWeight: '700' }}
             style={{ marginVertical: SIZES.sm, height: 42, marginHorizontal: SIZES.lg }}
          />
+         <Text
+            style={{
+               fontSize: 22,
+               fontWeight: '700',
+               textAlign: 'center',
+               marginBottom: SIZES.sm
+            }}>
+            {OPTIONS[selectedIndex]} Total: ${total.toFixed(2)}
+         </Text>
          <FlatList
             scrollEnabled={false}
             data={data}

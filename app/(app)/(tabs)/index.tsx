@@ -13,8 +13,9 @@ import * as Animatable from 'react-native-animatable'
 
 import { useEffect, useMemo } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { useDriverLocation } from '@/hooks/useDriverLocation'
 import OnlineToggleButton from '@/components/OnlineToggleButton'
+import { Button } from '@/components/Button'
+import { useModal } from '@/providers/ModalProvider'
 
 const Home = () => {
    const { user } = useUser()
@@ -43,12 +44,23 @@ const Home = () => {
       [orders]
    )[0]
 
+   const { showModal } = useModal()
+
+   const openModal = () => {
+      showModal({
+         title: 'Welcome to the Modal',
+         data: 'Helo',
+         onClose: () => console.log('Modal closed!')
+      })
+   }
+
    useEffect(() => {}, [])
    return (
       <Container>
          <OnlineToggleButton />
 
          <View style={styles.container}>
+            <Button title="Open" onPress={openModal} />
             {!user?.isOnline && <Text style={styles.offlineTitle}>You are Off-line</Text>}
             {currentOrder && (
                <View>
