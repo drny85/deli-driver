@@ -25,7 +25,15 @@ const MapOrderDetails = ({ order, business, distance }: Props) => {
 
    return (
       <View style={styles.container}>
-         <Text style={styles.tip}>Tips {order.tip?.amount.toFixed(2)}</Text>
+         <Row
+            containerStyle={{
+               justifyContent: 'space-evenly',
+               alignItems: 'center',
+               marginBottom: SIZES.sm
+            }}>
+            <Text style={styles.tip}>Order #: {order.orderNumber}</Text>
+            <Text style={styles.tip}>Tips {order.tip?.amount.toFixed(2)}</Text>
+         </Row>
          <Row align="between">
             <View style={{ justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
                <Ionicons
@@ -110,7 +118,6 @@ const styles = StyleSheet.create({
    tip: {
       fontFamily: 'Genos-Bold',
       fontSize: 24,
-      textAlign: 'center',
-      marginBottom: SIZES.sm
+      textAlign: 'center'
    }
 })

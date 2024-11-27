@@ -1,9 +1,9 @@
+import NewOrderNotificationScreen from '@/components/NewOrderNotificationScreen'
 import React, { createContext, useContext, useState } from 'react'
-import { Modal, View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native'
+import { Modal, View, StyleSheet, Dimensions } from 'react-native'
 
 // Types for modal content
 type ModalContent = {
-   title: string
    data: string
    onClose?: () => void
 }
@@ -38,13 +38,11 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
          <Modal transparent visible={visible} animationType="slide">
             <View style={styles.overlay}>
                <View style={styles.modalContainer}>
-                  <Text style={styles.title}>{modalContent?.title}</Text>
-                  <View style={styles.body}>
-                     <Text>New Order {modalContent?.data}</Text>
-                  </View>
-                  <TouchableOpacity style={styles.closeButton} onPress={hideModal}>
+                  <NewOrderNotificationScreen orderId={modalContent?.data!} onClose={hideModal} />
+
+                  {/* <TouchableOpacity style={styles.closeButton} onPress={hideModal}>
                      <Text style={styles.closeButtonText}>Close</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                </View>
             </View>
          </Modal>
@@ -65,12 +63,12 @@ export const useModal = (): ModalContextType => {
 const styles = StyleSheet.create({
    overlay: {
       flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'center',
-      alignItems: 'center'
+      backgroundColor: 'rgba(0,0,0,0.5)'
    },
    modalContainer: {
-      width: Dimensions.get('window').width * 0.8,
+      height: Dimensions.get('window').height * 0.9,
+      marginTop: 'auto',
+      width: '100%',
       backgroundColor: 'white',
       borderRadius: 10,
       padding: 20,

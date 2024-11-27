@@ -83,7 +83,7 @@ export interface Order {
    otpPickup?: number | null
    distance?: number
 }
-
+export type Range = 'today' | 'wtd' | 'mtd' | 'all'
 export enum ORDER_TYPE {
    pickup = 'pickup',
    delivery = 'delivery'

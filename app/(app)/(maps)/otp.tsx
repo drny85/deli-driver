@@ -94,8 +94,8 @@ const OTP = ({ code, lenght, title, callBack, extraInfo, override, show, setShow
                      {otp.map((digit, index) =>
                         showNumber ? (
                            <Animated.Text
-                              entering={SlideInRight.duration(300)}
-                              exiting={SlideOutRight.duration(300)}
+                              entering={SlideInRight}
+                              exiting={SlideOutRight}
                               style={{
                                  fontFamily: 'Genos-Bold',
                                  fontSize: 40,

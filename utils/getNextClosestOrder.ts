@@ -1,7 +1,7 @@
-import { Coords, Order, ORDER_STATUS, TempOrder } from '@/typing'
+import { Coords, Order, ORDER_STATUS } from '@/typing'
 import { calculateDistance } from './calculateDistance'
 
-export function findUndeliveredOrder(orders: Order[], currentLocation: Coords): TempOrder | null {
+export function findUndeliveredOrder(orders: Order[], currentLocation: Coords): Order | null {
    let closestUndeliveredOrder: Order | null = null
    let closestDistance = Infinity
 

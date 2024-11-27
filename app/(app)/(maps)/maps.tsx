@@ -42,11 +42,13 @@ let timeOut: NodeJS.Timeout
 
 const Maps = () => {
    const { updateUser, user } = useAuth()
+
    const [drivingMode, setDrivingMode] = useState<MapViewDirectionsMode>('DRIVING')
    const [driverLocation, setDriverLocation] = useState<Coords | null>(null)
    const { orderId } = useLocalSearchParams<{ orderId: string }>()
    const { getOrder, setOrders, orders, updateOrder } = useOrdersStore()
    const order = getOrder(orderId!)
+
    const restaurant = order.address?.coords
    // useDriverLocation(user?.id!, (location) => {a
    //    console.log('Location: ', location)
@@ -112,6 +114,7 @@ const Maps = () => {
             busy: true
          })
          await startBackgroundLocationUpdates()
+
          router.back()
          return
       } else if (order?.status === ORDER_STATUS.accepted_by_driver) {
@@ -143,7 +146,7 @@ const Maps = () => {
       try {
          const success = await updateOrder(updatedNewOrder)
          if (!success || !user) return
-         updateUser({
+         await updateUser({
             ...user!,
             busy: false
          })
@@ -155,7 +158,7 @@ const Maps = () => {
                return o
             })
          ])
-
+         console.log('Going to NextOrder')
          router.replace('/nextOrder')
       } catch (error) {
          console.log(error)

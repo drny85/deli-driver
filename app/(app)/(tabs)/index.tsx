@@ -11,18 +11,20 @@ import dayjs from 'dayjs'
 import { router } from 'expo-router'
 import * as Animatable from 'react-native-animatable'
 
-import { useEffect, useMemo } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import OnlineToggleButton from '@/components/OnlineToggleButton'
-import { Button } from '@/components/Button'
-import { useModal } from '@/providers/ModalProvider'
+import { useMemo } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import EarningsData from '@/components/charts/EarningsData'
 
 const Home = () => {
    const { user } = useUser()
 
-   // const { getForgroundLocation } = useBackgroundLocation()
-
+   // const { getForgroundLocation } = useBackgroundLocation()t
    const orders = useOrdersStore((state) =>
+      state.orders.filter((o) => o.status !== ORDER_STATUS.cancelled)
+   )
+
+   const data = useOrdersStore((state) =>
       state.orders.filter(
          (o) =>
             o.status !== ORDER_STATUS.cancelled &&
@@ -35,32 +37,20 @@ const Home = () => {
       [orders]
    )
 
-   const todayOrders = orders.filter((o) => o.status === ORDER_STATUS.marked_ready_for_delivery)
-   const inQueue = orders.filter((o) => o.status === ORDER_STATUS.accepted_by_driver)
-   const completed = orders.filter((o) => o.status === ORDER_STATUS.delivered)
+   const todayOrders = data.filter((o) => o.status === ORDER_STATUS.marked_ready_for_delivery)
+   const inQueue = data.filter((o) => o.status === ORDER_STATUS.accepted_by_driver)
+   const completed = data.filter((o) => o.status === ORDER_STATUS.delivered)
 
    const currentOrder = useMemo(
-      () => orders.filter((o) => o.status === ORDER_STATUS.picked_up_by_driver),
-      [orders]
+      () => data.filter((o) => o.status === ORDER_STATUS.picked_up_by_driver),
+      [data]
    )[0]
 
-   const { showModal } = useModal()
-
-   const openModal = () => {
-      showModal({
-         title: 'Welcome to the Modal',
-         data: 'Helo',
-         onClose: () => console.log('Modal closed!')
-      })
-   }
-
-   useEffect(() => {}, [])
    return (
       <Container>
          <OnlineToggleButton />
 
          <View style={styles.container}>
-            <Button title="Open" onPress={openModal} />
             {!user?.isOnline && <Text style={styles.offlineTitle}>You are Off-line</Text>}
             {currentOrder && (
                <View>
@@ -102,7 +92,7 @@ const Home = () => {
                </NeoView>
             </TouchableOpacity>
 
-            {deliveredOrders.length > 0 && <EarningsScreen orders={deliveredOrders} />}
+            {deliveredOrders.length > 0 && <EarningsData orders={deliveredOrders} />}
          </View>
       </Container>
    )
