@@ -53,6 +53,7 @@
       "react-native": "0.76.3",
       "react-native-animatable": "^1.4.0",
       "react-native-communications": "^2.2.1",
+      "react-native-countdown-circle-timer": "^3.2.1",
       "react-native-gesture-handler": "~2.20.2",
       "react-native-gifted-charts": "^1.4.22",
       "react-native-maps": "1.18.0",

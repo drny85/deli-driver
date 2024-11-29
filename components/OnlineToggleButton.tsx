@@ -3,13 +3,24 @@ import React from 'react'
 import { useAuth } from '@/providers/authProvider'
 import { updateCourier } from '@/actions/user/createCourier'
 import NeoView from './NeoView'
-import {
-   startBackgroundLocationUpdates,
-   stopBackgroundLocationUpdates
-} from '@/hooks/useDriverLocation'
+import { startBackgroundLocationUpdates, stopBackgroundLocationUpdates } from '@/utils/location'
+import { useSettingsStore } from '@/providers/settingsStore'
+import { useOrdersStore } from '@/providers/ordersStore'
+import { ORDER_STATUS } from '@/typing'
+import { isToday } from 'date-fns'
 
 const OnlineToggleButton = () => {
    const { user } = useAuth()
+   const { orders } = useOrdersStore()
+   const todayOrders = orders.filter((o) => isToday(o.orderDate))
+
+   const preventFromGoingOffilenWithPendingOrders = () => {
+      if (user?.isOnline && todayOrders?.some((o) => o.status !== ORDER_STATUS.delivered)) {
+         Alert.alert('Pending Orders', 'You have pending orders. Please deliver them first')
+         return true
+      }
+      return false
+   }
 
    const handleOnlineToggle = () => {
       // Implement online/offline toggle logic here
@@ -26,6 +37,8 @@ const OnlineToggleButton = () => {
                style: 'destructive',
                onPress: () => {
                   if (!user) return
+                  const canContinue = preventFromGoingOffilenWithPendingOrders()
+                  if (canContinue) return
                   // Handle the online/offline toggle logic here
                   updateCourier({ ...user, isOnline: !user?.isOnline })
                   if (user.isOnline) {
@@ -33,6 +46,7 @@ const OnlineToggleButton = () => {
                      stopBackgroundLocationUpdates()
                   } else {
                      // send notification to all drivers that user is online
+                     useSettingsStore.getState().onOpen()
                      startBackgroundLocationUpdates()
                   }
                }

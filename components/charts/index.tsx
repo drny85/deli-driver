@@ -50,17 +50,17 @@ const EarningsData = ({ orders }: { orders: Order[] }) => {
                gap: SIZES.md
             }}>
             {chartData.length === 0 && <Text style={styles.centerLabel}>No data available</Text>}
+
             <PieChart
                data={chartData}
                donut
                innerRadius={SIZE}
                radius={SIZE * 2}
-               focusOnPress
                sectionAutoFocus
-               showText
-               isAnimated
+               showText={range !== 'all'}
                textColor="#212121"
-               // pieInnerComponent={(item, index) => <Text>{item?.text}</Text>}
+               textSize={13}
+               showGradient
                centerLabelComponent={() => (
                   <View style={styles.totalView}>
                      <Text style={[styles.centerLabel, { fontWeight: 'condensed' }]}>Total</Text>
@@ -68,21 +68,33 @@ const EarningsData = ({ orders }: { orders: Order[] }) => {
                   </View>
                )}
             />
-            {chartData.length > 0 && (
+
+            <View
+               style={{
+                  backgroundColor: 'white',
+                  width: '100%',
+                  borderRadius: SIZES.sm,
+                  padding: SIZES.sm,
+                  boxShadow: chartData.length > 0 ? '-3px -2px 8px rgba(0, 0, 0, 0.2)' : undefined
+               }}>
                <Animated.View style={[styles.legendContainer]}>
                   {chartData.map((item, index) => (
                      <Animated.View key={index} style={[styles.legendItem, animatedStyle]}>
-                        {renderDot(item.color!)}
+                        {renderDot(item.color)}
                         <Row containerStyle={{ gap: 4 }}>
-                           <Text style={[styles.centerLabel, { fontWeight: '500' }]}>
+                           <Text
+                              adjustsFontSizeToFit
+                              style={[styles.centerLabel, { fontWeight: '500' }]}>
                               {item.text}:
                            </Text>
-                           <Text style={styles.centerLabel}>${item.value.toFixed(2)}</Text>
+                           <Text adjustsFontSizeToFit style={styles.centerLabel}>
+                              ${item.value.toFixed(2)}
+                           </Text>
                         </Row>
                      </Animated.View>
                   ))}
                </Animated.View>
-            )}
+            </View>
          </View>
 
          <RangeSegmentedControl selectedRange={range} onChange={setRange} />
@@ -95,33 +107,31 @@ export default EarningsData
 const styles = StyleSheet.create({
    container: {
       flex: 1,
-      padding: 10,
+      padding: 16,
       justifyContent: 'center',
       alignItems: 'center'
    },
    legendContainer: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      paddingVertical: SIZES.sm,
+      paddingTop: 10,
       width: '100%',
-      backgroundColor: 'white',
-      borderRadius: 10,
-      boxShadow: '3px 3px 5px rgba(0,0,0,0.2)',
+
       paddingHorizontal: 16
    },
    legendItem: {
       flexDirection: 'row',
       justifyContent: 'flex-start',
       alignItems: 'center',
-      marginVertical: 4
+      marginVertical: 4,
+      marginHorizontal: 2
    },
    dot: {
       height: 10,
       width: 10,
       borderRadius: 5,
-      marginRight: 4
+      marginRight: 8
    },
    totalView: {
       justifyContent: 'center',

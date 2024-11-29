@@ -1,17 +1,16 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
 import { Container } from '@/components/Container'
-import { Button } from '@/components/Button'
+import Loading from '@/components/Loading'
+import Row from '@/components/Row'
+import { Colors, SIZES } from '@/constants/Colors'
+import { useAuth } from '@/providers/authProvider'
 import { useOrdersStore } from '@/providers/ordersStore'
+import { Order, ORDER_STATUS } from '@/typing'
 import { findUndeliveredOrder } from '@/utils/getNextClosestOrder'
+import { Feather } from '@expo/vector-icons'
 import * as Location from 'expo-location'
 import { router } from 'expo-router'
-import { Colors, SIZES } from '@/constants/Colors'
-import { Order, ORDER_STATUS } from '@/typing'
-import { useAuth } from '@/providers/authProvider'
-import Row from '@/components/Row'
-import { Feather } from '@expo/vector-icons'
-import Loading from '@/components/Loading'
+import React, { useCallback, useEffect, useState } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 const NextOrder = () => {
    const { user } = useAuth()
@@ -19,26 +18,33 @@ const NextOrder = () => {
    const moreOrders = orders.filter((order) => order.status === ORDER_STATUS.accepted_by_driver)
    const [nextOrder, setNextOrder] = useState<Order | null>(null)
 
-   const handleNextOrder = useCallback(async () => {
-      if (moreOrders.length === 0) return
-      try {
-         const { coords } = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Highest
-         })
-         if (!coords) return
+   const handleNextOrder = useCallback(
+      async (go?: boolean) => {
+         if (moreOrders.length === 0) return
+         try {
+            const { coords } = await Location.getCurrentPositionAsync({
+               accuracy: Location.Accuracy.Highest
+            })
+            if (!coords) return
 
-         const nextOrder = findUndeliveredOrder(moreOrders, {
-            latitude: coords.latitude,
-            longitude: coords.longitude
-         })
-         if (!nextOrder) return
-         setNextOrder(nextOrder)
+            const nextOrder = findUndeliveredOrder(moreOrders, {
+               latitude: coords.latitude,
+               longitude: coords.longitude
+            })
+            if (!nextOrder) return
+            if (go) {
+               router.push({ pathname: '/maps', params: { orderId: nextOrder?.id } })
+            } else {
+               setNextOrder(nextOrder)
+            }
 
-         // router.push({ pathname: '/maps', params: { orderId: nextOrder?.id } })
-      } catch (error) {
-         console.log(error)
-      }
-   }, [orders, moreOrders])
+            // router.push({ pathname: '/maps', params: { orderId: nextOrder?.id } })
+         } catch (error) {
+            console.log(error)
+         }
+      },
+      [orders, moreOrders]
+   )
 
    const goToNextOrder = () => {
       if (!nextOrder) return
@@ -78,7 +84,7 @@ const NextOrder = () => {
                   <Text style={styles.buttonText}>All Orders</Text>
                </TouchableOpacity>
                {moreOrders.length > 0 && (
-                  <TouchableOpacity style={styles.button} onPress={goToNextOrder}>
+                  <TouchableOpacity style={styles.button} onPress={() => handleNextOrder(true)}>
                      <Text style={styles.buttonText}>Take Next</Text>
                      <Feather name="chevron-right" size={28} color={Colors.main} />
                   </TouchableOpacity>

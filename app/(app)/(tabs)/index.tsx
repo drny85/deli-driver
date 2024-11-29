@@ -1,5 +1,4 @@
 import { Container } from '@/components/Container'
-import EarningsScreen from '@/components/EarningByDays'
 import NeoView from '@/components/NeoView'
 import Row from '@/components/Row'
 import { Colors, SIZES } from '@/constants/Colors'
@@ -7,14 +6,15 @@ import { useUser } from '@/hooks/useUser'
 import { useOrdersStore } from '@/providers/ordersStore'
 import { ORDER_STATUS } from '@/typing'
 
-import dayjs from 'dayjs'
 import { router } from 'expo-router'
 import * as Animatable from 'react-native-animatable'
 
+import EarningsData from '@/components/charts/EarningsData'
+import GoOnlineCircle from '@/components/GoOnlineCircle'
 import OnlineToggleButton from '@/components/OnlineToggleButton'
+import { isToday } from 'date-fns'
 import { useMemo } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import EarningsData from '@/components/charts/EarningsData'
 
 const Home = () => {
    const { user } = useUser()
@@ -25,11 +25,7 @@ const Home = () => {
    )
 
    const data = useOrdersStore((state) =>
-      state.orders.filter(
-         (o) =>
-            o.status !== ORDER_STATUS.cancelled &&
-            dayjs(o.orderDate).startOf('day').isSame(dayjs().startOf('day'))
-      )
+      state.orders.filter((o) => o.status !== ORDER_STATUS.cancelled && isToday(o.orderDate))
    )
 
    const deliveredOrders = useMemo(
@@ -94,6 +90,7 @@ const Home = () => {
 
             {deliveredOrders.length > 0 && <EarningsData orders={deliveredOrders} />}
          </View>
+         <GoOnlineCircle />
       </Container>
    )
 }

@@ -28,6 +28,7 @@ const RangeSegmentedControl: React.FC<SegmentedControlProps> = ({ selectedRange,
                fontSize: 18,
                color: Colors.main
             }}
+            tintColor="white"
             style={styles.segmentedControl}
          />
       </View>

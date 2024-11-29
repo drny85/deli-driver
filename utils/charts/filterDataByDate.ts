@@ -1,5 +1,8 @@
 import { Order } from '@/typing'
 import { isSameDay, isSameWeek, isSameMonth, format, endOfWeek } from 'date-fns'
+import { getTextColor } from './getTextColor'
+import { pieDataItem } from 'react-native-gifted-charts'
+import { Text } from 'react-native'
 type PieChartData = {
    value: number
    text: string
@@ -32,18 +35,21 @@ export const filterOrdersByDate = (orders: Order[], range: Range): Order[] => {
    }
 }
 
-export const transformDataForPieChart = (orders: Order[], range: Range): PieChartData[] => {
+export const transformDataForPieChart = (orders: Order[], range: Range): pieDataItem[] => {
    const categorizedData = categorizeTipsByRange(orders, range)
 
    // Determine the maximum value in categorized data for the "focused" property
    const maxValue = Math.max(...categorizedData.map(({ value }) => value), 0)
 
    // Generate chart data
+
    return categorizedData.map(({ category, value }) => ({
       value,
       color: generateHexColor(), // Generate random colors for the chart
       text: category, // Use category (e.g., Morning, Afternoon, etc.) as text
-      focused: value === maxValue // Mark the highest value as focused
+      focused: value === maxValue
+
+      // Mark the highest value as focused
    }))
 }
 

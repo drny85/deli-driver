@@ -9,13 +9,16 @@ import { Colors, SIZES } from '@/constants/Colors'
 import { useBusiness } from '@/hooks/useBusiness'
 
 import { useAuth } from '@/providers/authProvider'
-import { useLocatioStore } from '@/providers/locationStore'
 import { useOrdersStore } from '@/providers/ordersStore'
 import { Coords, Order, ORDER_STATUS } from '@/typing'
 import { actionTitle } from '@/utils/actionTitle'
 
+import { listenToDriverLocation } from '@/actions/courier'
+import { Sheet, useSheetRef } from '@/components/Sheet'
+import { startBackgroundLocationUpdates } from '@/utils/location'
 import Constants from 'expo-constants'
 import { router, useLocalSearchParams } from 'expo-router'
+import debounce from 'lodash.debounce'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
 import MapView, { Marker, Region } from 'react-native-maps'
@@ -26,10 +29,6 @@ import MapViewDirections, {
 import openMap from 'react-native-open-maps'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 import OTP from './otp'
-import { Sheet, useSheetRef } from '@/components/Sheet'
-import { listenToDriverLocation } from '@/actions/courier'
-import debounce from 'lodash.debounce'
-import { startBackgroundLocationUpdates } from '@/utils/location'
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || ''
 
@@ -260,7 +259,7 @@ const Maps = () => {
 
    // if (!API_KEY) return;
 
-   if (loading) return <Loading />
+   if (loading || !order) return <Loading />
    return (
       <View style={styles.container}>
          <MapHeader
