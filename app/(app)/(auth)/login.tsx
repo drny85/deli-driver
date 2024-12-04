@@ -89,7 +89,7 @@ const Login = () => {
    useEffect(() => {
       if (!router) return
       if (user && !user.emailVerified) {
-         router.replace('/(auth)/verifyEmail')
+         router.replace('/verifyEmail')
       } else if (
          user &&
          user.emailVerified &&
@@ -99,7 +99,7 @@ const Login = () => {
          !user.transportation &&
          !user.image
       ) {
-         router.replace('/(auth)/onboarding')
+         router.replace('/onboarding')
       } else if (
          user &&
          user.emailVerified &&
@@ -109,7 +109,7 @@ const Login = () => {
          user.transportation &&
          !user.isActive
       ) {
-         router.replace('/(auth)/stripe-onboarding')
+         router.replace('/stripe-onboarding')
       }
    }, [user, router])
    return (
@@ -183,7 +183,7 @@ const Login = () => {
                   <View style={styles.bottom}>
                      <Text style={styles.bottomText}>Dont have an account?</Text>
                      <Text
-                        onPress={() => router.push('/(auth)/signup')}
+                        onPress={() => router.push('/signup')}
                         style={[styles.bottomText, { fontSize: 20 }]}>
                         Sign Up
                      </Text>

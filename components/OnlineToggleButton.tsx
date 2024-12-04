@@ -2,14 +2,18 @@ import { Alert, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useAuth } from '@/providers/authProvider'
 import { updateCourier } from '@/actions/user/createCourier'
-import NeoView from './NeoView'
+
 import { startBackgroundLocationUpdates, stopBackgroundLocationUpdates } from '@/utils/location'
 import { useSettingsStore } from '@/providers/settingsStore'
 import { useOrdersStore } from '@/providers/ordersStore'
 import { ORDER_STATUS } from '@/typing'
 import { isToday } from 'date-fns'
+import { Colors } from '@/constants/Colors'
 
-const OnlineToggleButton = () => {
+type Props = {
+   size?: number
+}
+const OnlineToggleButton = ({ size }: Props) => {
    const { user } = useAuth()
    const { orders } = useOrdersStore()
    const todayOrders = orders.filter((o) => isToday(o.orderDate))
@@ -63,10 +67,19 @@ const OnlineToggleButton = () => {
    ) : (
       <TouchableOpacity
          onPress={handleOnlineToggle}
-         style={{ position: 'absolute', bottom: 12, right: 10, zIndex: 50 }}>
-         <NeoView rounded size={54}>
-            <Text style={{ fontSize: 22, fontWeight: '600' }}>Go</Text>
-         </NeoView>
+         style={{
+            //position: 'absolute',
+
+            width: size || 100,
+            height: size || 100,
+            borderRadius: size ? size / 2 : 100,
+            justifyContent: 'center',
+            alignItems: 'center',
+
+            backgroundColor: Colors.main
+         }}>
+         <Text style={{ fontSize: 40, fontWeight: '600', color: 'white' }}>Go</Text>
+         <Text style={{ fontSize: 20, fontWeight: '600', color: 'white' }}>Online</Text>
       </TouchableOpacity>
    )
 }

@@ -11,6 +11,7 @@ type ModalContent = {
 type ModalContextType = {
    showModal: (content: ModalContent) => void
    hideModal: () => void
+   visible: boolean
 }
 
 // Create context for modal
@@ -29,11 +30,12 @@ export const ModalProvider: React.FC<{ children: React.ReactNode }> = ({ childre
    const hideModal = () => {
       if (modalContent?.onClose) modalContent.onClose()
       setVisible(false)
+
       setModalContent(null)
    }
 
    return (
-      <ModalContext.Provider value={{ showModal, hideModal }}>
+      <ModalContext.Provider value={{ showModal, hideModal, visible }}>
          {children}
          <Modal transparent visible={visible} animationType="slide">
             <View style={styles.overlay}>

@@ -8,10 +8,14 @@ import { PieChart } from 'react-native-gifted-charts'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import Row from '../Row'
 import RangeSegmentedControl from './RangeSegmentedControl'
+import { useAuth } from '@/providers/authProvider'
+
+import OnlineToggleButton from '../OnlineToggleButton'
 
 const SIZE = SIZES.width / 6
 
 const EarningsData = ({ orders }: { orders: Order[] }) => {
+   const { user } = useAuth()
    const width = useSharedValue(48)
    const [range, setRange] = useState<Range>('all')
 
@@ -57,16 +61,22 @@ const EarningsData = ({ orders }: { orders: Order[] }) => {
                radius={SIZE * 2}
                focusOnPress
                sectionAutoFocus
-               showText
+               pieInnerComponentHeight={20}
                isAnimated
-               textColor="#212121"
-               // pieInnerComponent={(item, index) => <Text>{item?.text}</Text>}
-               centerLabelComponent={() => (
-                  <View style={styles.totalView}>
-                     <Text style={[styles.centerLabel, { fontWeight: 'condensed' }]}>Total</Text>
-                     <Text style={[styles.centerLabel, { fontSize: 26 }]}>${total.toFixed(2)}</Text>
-                  </View>
-               )}
+               showText
+               textColor="#FFFFFF"
+               centerLabelComponent={() =>
+                  user?.isOnline ? (
+                     <View style={styles.totalView}>
+                        <Text style={[styles.centerLabel, { fontWeight: 'condensed' }]}>Total</Text>
+                        <Text style={[styles.centerLabel, { fontSize: 26 }]}>
+                           ${total.toFixed(2)}
+                        </Text>
+                     </View>
+                  ) : (
+                     <OnlineToggleButton size={SIZE * 2} />
+                  )
+               }
             />
             {chartData.length > 0 && (
                <Animated.View style={[styles.legendContainer]}>

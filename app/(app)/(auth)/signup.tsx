@@ -46,7 +46,7 @@ const Signup = () => {
       control,
       handleSubmit,
       reset,
-      getFieldState,
+
       formState: { errors, isSubmitting }
    } = useForm<SignupSchema>({
       defaultValues: {

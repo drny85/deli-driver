@@ -1,5 +1,13 @@
+import { Button } from '@/components/Button'
+import { Container } from '@/components/Container'
+import Input from '@/components/Input'
+import { Colors, SIZES } from '@/constants/Colors'
+import { useUser } from '@/hooks/useUser'
+import { zodResolver } from '@hookform/resolvers/zod'
+import SegmentedControl from '@react-native-segmented-control/segmented-control'
+import React, { useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import {
-   Alert,
    KeyboardAvoidingView,
    Platform,
    ScrollView,
@@ -8,24 +16,15 @@ import {
    TouchableOpacity,
    View
 } from 'react-native'
-import React, { useEffect } from 'react'
-import { Container } from '@/components/Container'
-import { useUser } from '@/hooks/useUser'
 import { z } from 'zod'
-import { Colors, SIZES } from '@/constants/Colors'
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import Input from '@/components/Input'
-import SegmentedControl from '@react-native-segmented-control/segmented-control'
-import { Button } from '@/components/Button'
 
-import { Image } from 'expo-image'
-import { usePhoto } from '@/hooks/usePhoto'
-import CircularProgressBar from '@/components/ScoreCircle'
-import { useFont } from '@shopify/react-native-skia'
-import { useSharedValue, withTiming } from 'react-native-reanimated'
 import { updateCourier } from '@/actions/user/createCourier'
+import CircularProgressBar from '@/components/ScoreCircle'
+import { usePhoto } from '@/hooks/usePhoto'
+import { useFont } from '@shopify/react-native-skia'
+import { Image } from 'expo-image'
 import { router } from 'expo-router'
+import { useSharedValue, withTiming } from 'react-native-reanimated'
 const IMAGE_SIZES = SIZES.width * 0.5
 export type DirectionsMode = 'DRIVING' | 'BICYCLING'
 
@@ -49,12 +48,9 @@ const Onboarding = () => {
    const {
       control,
       handleSubmit,
-      reset,
-      getValues,
       setValue,
-      getFieldState,
 
-      formState: { errors, isValid, isSubmitting }
+      formState: { errors, isSubmitting }
    } = useForm<FirstSchema>({
       defaultValues: {
          lastName: '',

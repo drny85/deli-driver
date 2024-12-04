@@ -1,5 +1,6 @@
 import { Container } from '@/components/Container'
 import Loading from '@/components/Loading'
+import Searching from '@/components/lotties/Searching'
 import Row from '@/components/Row'
 import { Colors, SIZES } from '@/constants/Colors'
 import { useAuth } from '@/providers/authProvider'
@@ -62,7 +63,7 @@ const NextOrder = () => {
       handleNextOrder()
    }, [])
 
-   if (!nextOrder) return <Loading />
+   if (!nextOrder) return <Searching />
 
    return (
       <Container>
@@ -84,7 +85,15 @@ const NextOrder = () => {
                   <Text style={styles.buttonText}>All Orders</Text>
                </TouchableOpacity>
                {moreOrders.length > 0 && (
-                  <TouchableOpacity style={styles.button} onPress={() => handleNextOrder(true)}>
+                  <TouchableOpacity
+                     style={styles.button}
+                     onPress={() => {
+                        if (nextOrder) {
+                           router.push({ pathname: '/maps', params: { orderId: nextOrder?.id } })
+                        } else {
+                           handleNextOrder(true)
+                        }
+                     }}>
                      <Text style={styles.buttonText}>Take Next</Text>
                      <Feather name="chevron-right" size={28} color={Colors.main} />
                   </TouchableOpacity>

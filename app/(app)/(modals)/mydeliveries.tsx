@@ -64,7 +64,13 @@ const MyDeliveries = () => {
       </TouchableOpacity>
    )
    return (
-      <ScrollView contentInsetAdjustmentBehavior="automatic">
+      <ScrollView
+         contentInsetAdjustmentBehavior="automatic"
+         showsVerticalScrollIndicator={false}
+         contentContainerStyle={{
+            padding: SIZES.sm,
+            paddingBottom: 100
+         }}>
          {/* SEGMENTED CONTROL */}
          <SegmentedControl
             values={OPTIONS}
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
       backgroundColor: Colors.white,
       borderRadius: SIZES.md,
       marginBottom: SIZES.sm,
-      boxShadow: '3px 3px 5px rgba(0,0,0,0.2)'
+      boxShadow: '3px 3px 5px rgba(0,0,0,0.1)'
    },
    orderContainer: {
       gap: SIZES.sm

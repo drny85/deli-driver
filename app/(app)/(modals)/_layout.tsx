@@ -1,3 +1,4 @@
+import { Colors } from '@/constants/Colors'
 import { StackScreenWithSearchBar } from '@/constants/layout'
 import { Feather } from '@expo/vector-icons'
 import { router, Stack } from 'expo-router'
@@ -13,6 +14,9 @@ const ModalsLayout = () => {
                title: 'My Deliveries',
                ...StackScreenWithSearchBar,
                headerLargeTitle: false,
+               contentStyle: {
+                  backgroundColor: Colors.primary
+               },
                headerLeft: ({ canGoBack, tintColor }) => (
                   <TouchableOpacity
                      onPress={() => {

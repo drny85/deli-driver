@@ -44,8 +44,6 @@ const Home = () => {
 
    return (
       <Container>
-         <OnlineToggleButton />
-
          <View style={styles.container}>
             {!user?.isOnline && <Text style={styles.offlineTitle}>You are Off-line</Text>}
             {currentOrder && (

@@ -7,7 +7,7 @@ import MapOrderDetails from '@/components/map/MapOrderDetails'
 import Row from '@/components/Row'
 import { Colors, SIZES } from '@/constants/Colors'
 import { useBusiness } from '@/hooks/useBusiness'
-
+import * as Location from 'expo-location'
 import { useAuth } from '@/providers/authProvider'
 import { useOrdersStore } from '@/providers/ordersStore'
 import { Coords, Order, ORDER_STATUS } from '@/typing'
@@ -21,7 +21,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import debounce from 'lodash.debounce'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native'
-import MapView, { Marker, Region } from 'react-native-maps'
+import MapView, { Camera, Marker, Region } from 'react-native-maps'
 import MapViewDirections, {
    MapDirectionsResponse,
    MapViewDirectionsMode
@@ -29,6 +29,7 @@ import MapViewDirections, {
 import openMap from 'react-native-open-maps'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
 import OTP from './otp'
+import { Image, ImageSource } from 'expo-image'
 
 const API_KEY = Constants.expoConfig?.extra?.env.EXPO_PUBLIC_GOOGLE_API || ''
 
@@ -36,6 +37,7 @@ const DELTA = {
    latitudeDelta: 0.02,
    longitudeDelta: 0.02
 }
+const MARKER_SIZE = 50
 let DISTANCE = 0.1
 let timeOut: NodeJS.Timeout
 
@@ -47,8 +49,12 @@ const Maps = () => {
    const { orderId } = useLocalSearchParams<{ orderId: string }>()
    const { getOrder, setOrders, orders, updateOrder } = useOrdersStore()
    const order = getOrder(orderId!)
+   const initialRegion = {
+      ...driverLocation!,
+      ...DELTA
+   }
 
-   const restaurant = order.address?.coords
+   const restaurant = order?.address?.coords
    // useDriverLocation(user?.id!, (location) => {a
    //    console.log('Location: ', location)
    // })
@@ -56,18 +62,12 @@ const Maps = () => {
    const snapshots = useMemo(() => ['18%', '65%', '80%'], [])
    const bottomSheetRef = useSheetRef()
 
-   const { business, loading } = useBusiness(order.businessId)
+   const { business, loading } = useBusiness(order?.businessId || '')
    const [show, setShow] = useState(false)
 
    const [distance, setDistance] = useState<number>(0)
    const [duration, setDuration] = useState<number>(0)
    const height = useSharedValue(0.2)
-
-   const [initialRegion, setInitialRegion] = useState<Region>({
-      latitude: 40.8306,
-      longitude: -73.90453,
-      ...DELTA
-   })
 
    // const [destination, setDestination] = useState<Coords | null>({
    //   latitude: 40.85109,
@@ -81,7 +81,7 @@ const Maps = () => {
          order?.status === ORDER_STATUS.marked_ready_for_delivery
             ? [driverLocation, business.coords]
             : [],
-      [driverLocation, business, order.status]
+      [driverLocation, business, order?.status]
    )
 
    const onMapChange = (changes: MapDirectionsResponse) => {
@@ -114,7 +114,7 @@ const Maps = () => {
          })
          await startBackgroundLocationUpdates()
 
-         router.back()
+         router.replace('/deliveries')
          return
       } else if (order?.status === ORDER_STATUS.accepted_by_driver) {
          const updatedNewOrder: Order = { ...order, status: ORDER_STATUS.picked_up_by_driver }
@@ -166,13 +166,15 @@ const Maps = () => {
 
    const updateCamera = debounce((location) => {
       if (order.status === ORDER_STATUS.marked_ready_for_delivery) return
-      mapViewRef.current?.animateCamera({
+      const adjustedCamera: Camera = {
          center: location,
-         zoom: 15,
-         pitch: 45, // 3D tilt
-         heading: 0
-      })
-   }, 500) // Adjust delay based on requirements
+         zoom: 15, // Adjust zoom level as needed
+         pitch: 45,
+         heading: 0,
+         altitude: 0
+      }
+      mapViewRef.current?.animateCamera(adjustedCamera, { duration: 1000 })
+   }, 200) // Adjust delay based on requirements
 
    useEffect(() => {
       // Start listening to the driver's location in Firestore
@@ -237,6 +239,20 @@ const Maps = () => {
                left: 20
             }
          })
+         timeOut = setTimeout(() => {
+            mapViewRef.current?.fitToSuppliedMarkers(['origin', 'restaurant'], {
+               edgePadding: {
+                  top: 20,
+                  right: 20,
+                  bottom: 20,
+                  left: 20
+               }
+            })
+         }, 2000)
+
+         timeOut = setTimeout(() => {
+            updateCamera(driverLocation)
+         }, 4000)
       }
 
       if (order.status === ORDER_STATUS.picked_up_by_driver) {
@@ -251,15 +267,15 @@ const Maps = () => {
    }, [driverLocation, order, business?.coords])
 
    useEffect(() => {
-      if (!order) {
+      if (!order || !order.address) {
          router.back()
-      } else {
       }
    }, [order])
 
    // if (!API_KEY) return;
 
-   if (loading || !order) return <Loading />
+   if (loading || !order || !order?.address?.coords || !driverLocation || !restaurant)
+      return <Loading />
    return (
       <View style={styles.container}>
          <MapHeader
@@ -278,7 +294,7 @@ const Maps = () => {
                openGoogleMap()
             }}
          />
-         {driverLocation && order.address?.coords && business?.coords && (
+         {driverLocation && order?.address?.coords && business?.coords && (
             <MapView
                style={[styles.map]}
                mapPadding={{
@@ -292,24 +308,39 @@ const Maps = () => {
                zoomControlEnabled
                initialRegion={initialRegion}
                region={initialRegion}
+               showsMyLocationButton={false}
+               onMapReady={() => {
+                  if (driverLocation && order.status !== ORDER_STATUS.marked_ready_for_delivery) {
+                     mapViewRef.current?.setCamera({
+                        center: driverLocation,
+                        zoom: 15,
+                        heading: 0,
+                        pitch: 45,
+                        altitude: 0
+                     })
+                  }
+               }}
                showsUserLocation
                userLocationPriority="high"
-               userLocationUpdateInterval={5000}
+               userLocationUpdateInterval={3000}
                followsUserLocation
                zoomTapEnabled
                showsPointsOfInterest={false}
                showsBuildings={false}>
                {driverLocation && (
-                  <Marker coordinate={{ ...driverLocation! }} title="Me" identifier="origin" />
+                  <Marker coordinate={{ ...driverLocation! }} title="Me" identifier="origin">
+                     <CustomMarker source={require('@/assets/images/delivery.png')} />
+                  </Marker>
                )}
                {business &&
-                  (order.status === ORDER_STATUS.marked_ready_for_delivery ||
-                     order.status === ORDER_STATUS.accepted_by_driver) && (
+                  (order?.status === ORDER_STATUS.marked_ready_for_delivery ||
+                     order?.status === ORDER_STATUS.accepted_by_driver) && (
                      <Marker
                         coordinate={business.coords!}
                         title={business.name}
-                        identifier="restaurant"
-                     />
+                        identifier="restaurant">
+                        <CustomMarker source={require('@/assets/images/food.png')} />
+                     </Marker>
                   )}
                {order && order.address?.coords && (
                   <Marker
@@ -319,36 +350,32 @@ const Maps = () => {
                   />
                )}
 
-               {driverLocation &&
-                  order &&
-                  order.address.coords &&
-                  restaurant &&
-                  bottomSheetRef.current && (
-                     <MapViewDirections
-                        apikey={API_KEY}
-                        mode={drivingMode}
-                        origin={driverLocation}
-                        destination={
-                           order.status === ORDER_STATUS.marked_ready_for_delivery
-                              ? order.address.coords
-                              : order.status === ORDER_STATUS.accepted_by_driver
-                                ? business?.coords
-                                : order.address.coords
-                        }
-                        strokeWidth={3}
-                        strokeColor={Colors.main}
-                        onStart={(params) => {
-                           console.log(
-                              `Started routing between "${params.origin}" and "${params.destination}"`
-                           )
-                        }}
-                        waypoints={waypoints}
-                        onError={(err) => {
-                           console.log('Error getting Directions', err)
-                        }}
-                        onReady={onMapChange}
-                     />
-                  )}
+               {driverLocation && order && restaurant && (
+                  <MapViewDirections
+                     apikey={API_KEY}
+                     mode={drivingMode}
+                     origin={driverLocation}
+                     destination={
+                        order.status === ORDER_STATUS.marked_ready_for_delivery
+                           ? order.address.coords
+                           : order.status === ORDER_STATUS.accepted_by_driver
+                             ? business?.coords
+                             : order.address.coords
+                     }
+                     strokeWidth={3}
+                     strokeColor={Colors.main}
+                     onStart={(params) => {
+                        console.log(
+                           `Started routing between "${params.origin}" and "${params.destination}"`
+                        )
+                     }}
+                     waypoints={waypoints}
+                     onError={(err) => {
+                        console.log('Error getting Directions', err)
+                     }}
+                     onReady={onMapChange}
+                  />
+               )}
             </MapView>
          )}
 
@@ -445,3 +472,26 @@ const styles = StyleSheet.create({
       fontFamily: 'Genos-Bold'
    }
 })
+
+const CustomMarker = ({ source }: { source: ImageSource }) => {
+   if (!source) return null
+   return (
+      <View
+         style={{
+            height: MARKER_SIZE,
+            width: MARKER_SIZE,
+            borderRadius: MARKER_SIZE / 2,
+            backgroundColor: '#ffffff',
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderWidth: 2,
+            borderColor: Colors.main
+         }}>
+         <Image
+            source={source}
+            tintColor={'black'}
+            style={{ width: MARKER_SIZE / 2, height: MARKER_SIZE / 2, objectFit: 'cover' }}
+         />
+      </View>
+   )
+}

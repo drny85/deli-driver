@@ -18,7 +18,7 @@ export default function App() {
 
    const onLayout = useCallback(async () => {
       if (fontsLoaded && !error) {
-         SplashScreen.hide()
+         SplashScreen.hideAsync()
       }
    }, [fontsLoaded, error])
 

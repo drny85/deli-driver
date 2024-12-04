@@ -21,7 +21,7 @@ const NewOrderNotificationScreen = ({ orderId, onClose }: Props) => {
          <View style={{ padding: 10, gap: 8 }}>
             <Text style={{ fontSize: 20 }}>Tip: ${order.tip?.amount.toFixed(2)}</Text>
             <Text style={{ fontSize: 16 }}>
-               Customer: {order.contactPerson.name} {order.contactPerson.name}
+               Customer: {order.contactPerson.name} {order.contactPerson.lastName}
             </Text>
             <Text style={{ fontSize: 16 }}>{order.address?.street}</Text>
          </View>

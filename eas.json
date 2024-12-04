@@ -5,6 +5,7 @@
    "build": {
       "development": {
          "developmentClient": true,
+         "channel": "development",
          "distribution": "internal",
          "ios": {
             "resourceClass": "medium"
@@ -19,6 +20,8 @@
       "preview": {
          "distribution": "internal"
       },
-      "production": {}
+      "production": {
+         "channel": "production"
+      }
    }
 }

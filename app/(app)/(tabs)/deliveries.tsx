@@ -22,22 +22,10 @@ type PropsParams = {
 }
 
 const Deliveries = () => {
-   const { user, loading } = useUser()
    const { orders: data } = useOrdersStore()
    const { index } = useLocalSearchParams<PropsParams>()
 
    const [option, setOption] = useState(0)
-
-   const onOnlinePress = useCallback(async () => {
-      if (!user) return
-      try {
-         // TIME_OUT = setTimeout(() => {
-         updateCourier({ ...user, isOnline: true })
-         // }, 1000);
-      } catch (error) {
-         console.log(error)
-      }
-   }, [user])
 
    const in_progress = data.filter((o) => o.status === ORDER_STATUS.picked_up_by_driver)
 
@@ -79,8 +67,6 @@ const Deliveries = () => {
 
    // return <OrderProgress status="Accepted By Courier" />;
 
-   if (loading) return <Loading />
-
    // if (!user?.isOnline) {
    //    return <GoOnline onPress={onOnlinePress} />
    // }
@@ -94,27 +80,17 @@ const Deliveries = () => {
                   backgroundColor: Colors.primary
                },
                headerShadowVisible: false,
-               headerLeft: () => {
+               headerRight: () => {
                   return (
                      <TouchableOpacity
                         onPress={() => router.push('/mydeliveries')}
-                        style={{ marginLeft: SIZES.md }}>
-                        <Text style={{ fontWeight: 600, fontSize: 18 }}>View All</Text>
+                        style={{ marginRight: SIZES.md }}>
+                        <Text style={{ fontWeight: 600, fontSize: 18, color: Colors.main }}>
+                           All
+                        </Text>
                      </TouchableOpacity>
                   )
-               },
-               headerRight:
-                  ordersToRender.length > 0
-                     ? () => {
-                          return (
-                             <TouchableOpacity
-                                style={{ padding: SIZES.sm }}
-                                onPress={() => router.push('/nextOrder')}>
-                                <FontAwesome name="filter" size={24} />
-                             </TouchableOpacity>
-                          )
-                       }
-                     : undefined
+               }
             }}
          />
          <View style={{ flex: 1, paddingHorizontal: SIZES.md }}>
@@ -143,14 +119,15 @@ const Deliveries = () => {
                contentContainerStyle={{ gap: SIZES.md, marginTop: SIZES.md }}
             />
          </View>
-         {in_progress.length > 0 && (
-            <View
-               style={{
-                  position: 'absolute',
-                  bottom: 10,
-                  right: 10,
-                  zIndex: 20
-               }}>
+         <View
+            style={{
+               position: 'absolute',
+               bottom: 10,
+               right: 10,
+               gap: SIZES.md,
+               zIndex: 20
+            }}>
+            {in_progress.length > 0 && (
                <TouchableOpacity
                   onPress={() =>
                      router.push({ pathname: '/maps', params: { orderId: in_progress[0].id } })
@@ -159,8 +136,15 @@ const Deliveries = () => {
                      <FontAwesome name="location-arrow" size={28} color={Colors.main} />
                   </NeoView>
                </TouchableOpacity>
-            </View>
-         )}
+            )}
+            {in_progress.length === 0 && (
+               <TouchableOpacity onPress={() => router.push('/nextOrder')}>
+                  <NeoView rounded size={50} containerStyle={{ backgroundColor: Colors.secondary }}>
+                     <FontAwesome name="list-ol" size={28} color={Colors.main} />
+                  </NeoView>
+               </TouchableOpacity>
+            )}
+         </View>
       </View>
    )
 }

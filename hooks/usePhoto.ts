@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import * as ImagePicker from 'expo-image-picker'
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
@@ -13,11 +13,11 @@ export const usePhoto = () => {
    const [selectedImage, setSelectedImage] = useState<string | undefined>()
    const [photo, setPhoto] = useState<ImagePicker.ImagePickerResult | null>(null)
 
-   const resetAll = () => {
+   const resetAll = useCallback(() => {
       setPhoto(null)
       setSelectedImage(undefined)
       progress.value = 0
-   }
+   }, [])
 
    const uploadPhoto = async (
       result: ImagePicker.ImagePickerResult,

@@ -1,14 +1,6 @@
 import { Order } from '@/typing'
 import { isSameDay, isSameWeek, isSameMonth, format, endOfWeek } from 'date-fns'
-import { getTextColor } from './getTextColor'
 import { pieDataItem } from 'react-native-gifted-charts'
-import { Text } from 'react-native'
-type PieChartData = {
-   value: number
-   text: string
-   color: string
-   focused?: boolean
-}
 
 type Range = 'today' | 'wtd' | 'mtd' | 'all'
 
