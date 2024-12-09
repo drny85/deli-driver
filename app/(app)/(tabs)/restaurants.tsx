@@ -51,15 +51,15 @@ const Restaurants = () => {
    const items = useMemo(() => {
       if (!search)
          return option === 0
-            ? business.filter((b) => b.couriers.includes(user?.id!))
-            : business.filter((b) => !b.couriers.includes(user?.id!))
+            ? business.filter((b) => b.couriers.map((c) => c.active && c.id).includes(user?.id!))
+            : business.filter((b) => !b.couriers.map((c) => c.id).includes(user?.id!))
       return business.filter((item) => item.name.toLowerCase().includes(search.toLowerCase()))
    }, [search, business, option, list])
 
    const onStoreRequestSent = async (businessId: string, enrolled: boolean) => {
       try {
          if (!businessId || !user) return
-         console.log('NO')
+
          if (!enrolled) {
             setLoading(true)
             const { message, success } = await addCourierToWaitingList(
@@ -80,7 +80,7 @@ const Restaurants = () => {
    }
 
    const renderBusiness: ListRenderItem<Business> = ({ item }) => {
-      const enrolled = item.couriers.includes(user?.id!)
+      const enrolled = item.couriers.map((c) => c.active && c.id).includes(user?.id!)
       const waiting = waitingList.includes(item.id!)
 
       return (

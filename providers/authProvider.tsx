@@ -17,6 +17,8 @@ import React, { createContext, PropsWithChildren, useContext, useEffect, useStat
 // Define types for AuthContext
 interface AuthContextType {
    user: Courier | null
+   isSigningUp: boolean
+   setIsSigningUp: React.Dispatch<React.SetStateAction<boolean>>
    signIn: (email: string, password: string) => Promise<void>
    signUp: (email: string, password: string, phone: string) => Promise<void>
    logOut: () => Promise<void>
@@ -42,6 +44,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: PropsWithChildren) => {
    const [user, setUser] = useState<Courier | null>(null)
    const [loading, setLoading] = useState(false)
+   const [isSigningUp, setIsSigningUp] = useState(false)
 
    useEffect(() => {
       const unsubscribe = onAuthStateChanged(auth, async (newUser) => {
@@ -123,6 +126,8 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
    const authContextValue: AuthContextType = {
       user,
+      isSigningUp,
+      setIsSigningUp,
       signIn,
       signUp,
       logOut,

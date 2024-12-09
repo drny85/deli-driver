@@ -24,6 +24,7 @@ import LottieView from 'lottie-react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { router } from 'expo-router'
 import { formatPhone } from '@/utils/formatPhone'
+import KeyboardScreen from '@/components/KeyboardScreen'
 const signupSchema = z
    .object({
       email: z.string().email(),
@@ -39,7 +40,7 @@ const signupSchema = z
 type SignupSchema = z.infer<typeof signupSchema>
 
 const Signup = () => {
-   const { signUp } = useAuth()
+   const { signUp, setIsSigningUp } = useAuth()
    const translateY = useSharedValue(0)
    const [showPassword, setShowPassword] = useState(false)
    const {
@@ -94,129 +95,124 @@ const Signup = () => {
       // return keyboardListener.remove();
    }, [])
    return (
-      <Container>
-         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
-               style={{ flex: 1, paddingHorizontal: SIZES.md }}
-               keyboardVerticalOffset={40}
-               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-               <Animated.View style={[styles.lottieContainer, animate]}>
-                  <LottieView
-                     style={styles.lottie}
-                     source={require('@/assets/animations/delivery_guy.json')}
-                     autoPlay
-                     loop
-                  />
-               </Animated.View>
-               <View
-                  style={{
-                     flex: 1,
-                     justifyContent: 'center',
-                     alignItems: 'center',
-                     gap: SIZES.lg
-                  }}>
-                  <Controller
-                     name="email"
-                     control={control}
-                     render={({ field: { onChange, value } }) => (
-                        <Input
-                           autoCapitalize="none"
-                           autoComplete="off"
-                           autoFocus
-                           autoCorrect={false}
-                           title="Email"
-                           placeholder="Email Address"
-                           value={value}
-                           error={errors.email?.message}
-                           onChangeText={(text) => onChange(text.toLowerCase())}
-                        />
-                     )}
-                  />
-                  <Controller
-                     name="phone"
-                     control={control}
-                     render={({ field: { onChange, value } }) => (
-                        <Input
-                           autoCapitalize="none"
-                           title="Cell Phone Number"
-                           keyboardType="number-pad"
-                           placeholder="(978) 564-3210"
-                           value={value}
-                           error={errors.phone?.message}
-                           onChangeText={(text) => onChange(formatPhone(text))}
-                        />
-                     )}
-                  />
-                  <Controller
-                     name="password"
-                     control={control}
-                     render={({ field: { onChange, value } }) => (
-                        <Input
-                           autoCapitalize="none"
-                           title="password"
-                           secureTextEntry={showPassword}
-                           placeholder="Password"
-                           value={value}
-                           error={errors.password?.message}
-                           onChangeText={onChange}
-                           RightIcon={
-                              <FontAwesome
-                                 onPress={() => setShowPassword((prev) => !prev)}
-                                 name={showPassword ? 'eye-slash' : 'eye'}
-                                 size={20}
-                                 color={Colors.main}
-                              />
-                           }
-                        />
-                     )}
-                  />
-                  <Controller
-                     name="confirmPassword"
-                     control={control}
-                     render={({ field: { onChange, value } }) => (
-                        <Input
-                           autoCapitalize="none"
-                           title="Confirm Password"
-                           secureTextEntry={showPassword}
-                           placeholder="Password"
-                           value={value}
-                           error={errors.confirmPassword?.message}
-                           onChangeText={onChange}
-                           RightIcon={
-                              <FontAwesome
-                                 onPress={() => setShowPassword((prev) => !prev)}
-                                 name={showPassword ? 'eye-slash' : 'eye'}
-                                 size={20}
-                                 color={Colors.main}
-                              />
-                           }
-                        />
-                     )}
-                  />
-
-                  <View style={{ width: '60%' }}>
-                     <Button
-                        disabled={isSubmitting}
-                        title="Sign Up"
-                        contentContainerStyle={{
-                           borderRadius: SIZES.lg * 2,
-                           shadowColor: 'transparent'
-                        }}
-                        onPress={handleSubmit(handleLogin)}
+      <KeyboardScreen>
+         <View style={{ flex: 1, paddingHorizontal: SIZES.md }}>
+            <Animated.View style={[styles.lottieContainer, animate]}>
+               <LottieView
+                  style={styles.lottie}
+                  source={require('@/assets/animations/delivery_guy.json')}
+                  autoPlay
+                  loop
+               />
+            </Animated.View>
+            <View
+               style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: SIZES.lg
+               }}>
+               <Controller
+                  name="email"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                     <Input
+                        autoCapitalize="none"
+                        autoComplete="off"
+                        autoFocus
+                        autoCorrect={false}
+                        title="Email"
+                        placeholder="Email Address"
+                        value={value}
+                        error={errors.email?.message}
+                        onChangeText={(text) => onChange(text.toLowerCase())}
                      />
-                  </View>
-                  <View style={styles.bottom}>
-                     <Text style={styles.bottomText}>have an account?</Text>
-                     <Text
-                        onPress={() => router.back()}
-                        style={[styles.bottomText, { fontSize: 20 }]}>
-                        Sign In
-                     </Text>
-                  </View>
+                  )}
+               />
+               <Controller
+                  name="phone"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                     <Input
+                        autoCapitalize="none"
+                        title="Cell Phone Number"
+                        keyboardType="number-pad"
+                        placeholder="(978) 564-3210"
+                        value={value}
+                        error={errors.phone?.message}
+                        onChangeText={(text) => onChange(formatPhone(text))}
+                     />
+                  )}
+               />
+               <Controller
+                  name="password"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                     <Input
+                        autoCapitalize="none"
+                        title="password"
+                        secureTextEntry={showPassword}
+                        placeholder="Password"
+                        value={value}
+                        error={errors.password?.message}
+                        onChangeText={onChange}
+                        RightIcon={
+                           <FontAwesome
+                              onPress={() => setShowPassword((prev) => !prev)}
+                              name={showPassword ? 'eye-slash' : 'eye'}
+                              size={20}
+                              color={Colors.main}
+                           />
+                        }
+                     />
+                  )}
+               />
+               <Controller
+                  name="confirmPassword"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                     <Input
+                        autoCapitalize="none"
+                        title="Confirm Password"
+                        secureTextEntry={showPassword}
+                        placeholder="Password"
+                        value={value}
+                        error={errors.confirmPassword?.message}
+                        onChangeText={onChange}
+                        RightIcon={
+                           <FontAwesome
+                              onPress={() => setShowPassword((prev) => !prev)}
+                              name={showPassword ? 'eye-slash' : 'eye'}
+                              size={20}
+                              color={Colors.main}
+                           />
+                        }
+                     />
+                  )}
+               />
+
+               <View style={{ width: '60%' }}>
+                  <Button
+                     disabled={isSubmitting}
+                     title="Sign Up"
+                     contentContainerStyle={{
+                        borderRadius: SIZES.lg * 2,
+                        shadowColor: 'transparent'
+                     }}
+                     onPress={handleSubmit(handleLogin)}
+                  />
                </View>
-            </KeyboardAvoidingView>
-         </TouchableWithoutFeedback>
-      </Container>
+               <View style={styles.bottom}>
+                  <Text style={styles.bottomText}>have an account?</Text>
+                  <Text
+                     onPress={() => setIsSigningUp(false)}
+                     style={[styles.bottomText, { fontSize: 20 }]}>
+                     Sign In
+                  </Text>
+               </View>
+            </View>
+         </View>
+      </KeyboardScreen>
    )
 }
 

@@ -8,11 +8,13 @@ import { useUser } from '@/hooks/useUser'
 import { onlyNumbers } from '@/utils/onlyNumbers'
 import { sendVerificationCode } from '@/utils/sendVerificationCode'
 import { router } from 'expo-router'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import Animated, { SlideInDown, SlideInLeft } from 'react-native-reanimated'
 import WebView, { WebViewNavigation } from 'react-native-webview'
 import OTP from '../(maps)/otp'
+import * as WebBrowswer from 'expo-web-browser'
+WebBrowswer.warmUpAsync()
 
 const STEPS = [
    'Your Home or Business Address',
@@ -36,6 +38,7 @@ const StripeOnboarding = () => {
       }
       return params
    }
+   console.log(user)
 
    const getLink = async () => {
       try {
@@ -107,6 +110,14 @@ const StripeOnboarding = () => {
 
    console.log(verificationCode)
 
+   useEffect(() => {
+      if (user?.stripeAccount && user.charges_enabled) {
+         router.replace('/welcome')
+      } else {
+         getLink()
+      }
+   }, [user])
+
    if (loading) return <Loading />
 
    if (!user?.phoneNumberVerified && user?.phone && !showVerification) {
@@ -124,6 +135,7 @@ const StripeOnboarding = () => {
                      <Button
                         title="Verify Phone Number"
                         disabled={loading}
+                        contentTextStyle={{ paddingHorizontal: 20 }}
                         onPress={async () => {
                            try {
                               setLoading(true)
@@ -149,15 +161,29 @@ const StripeOnboarding = () => {
    }
 
    if (stripeLinkUrl) {
-      return (
-         <WebView
-            style={{ flex: 1, paddingTop: SIZES.md }}
-            ref={webViewRef}
-            originWhitelist={['*']}
-            source={{ uri: stripeLinkUrl }}
-            onNavigationStateChange={handleNavigationChanges}
-            sharedCookiesEnabled={true}></WebView>
-      )
+      WebBrowswer.openBrowserAsync(stripeLinkUrl, {
+         presentationStyle: WebBrowswer.WebBrowserPresentationStyle.FULL_SCREEN,
+         windowFeatures: {
+            popup: true,
+            toolbar: false
+         }
+      })
+         .then((res) => {
+            console.log(res)
+         })
+         .catch((err) => {
+            console.log(err)
+         })
+
+      // return (
+      //    <WebView
+      //       style={{ flex: 1, paddingTop: SIZES.md }}
+      //       ref={webViewRef}
+      //       originWhitelist={['*']}
+      //       source={{ uri: stripeLinkUrl }}
+      //       onNavigationStateChange={handleNavigationChanges}
+      //       sharedCookiesEnabled={true}></WebView>
+      // )
    }
 
    if (showVerification && verificationCode)

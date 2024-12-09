@@ -56,6 +56,7 @@
       "react-native-countdown-circle-timer": "^3.2.1",
       "react-native-gesture-handler": "~2.20.2",
       "react-native-gifted-charts": "^1.4.22",
+      "react-native-keyboard-controller": "^1.14.5",
       "react-native-maps": "1.18.0",
       "react-native-maps-directions": "^1.9.0",
       "react-native-open-maps": "^0.4.3",

@@ -11,10 +11,10 @@ import * as Animatable from 'react-native-animatable'
 
 import EarningsData from '@/components/charts/EarningsData'
 import GoOnlineCircle from '@/components/GoOnlineCircle'
-import OnlineToggleButton from '@/components/OnlineToggleButton'
 import { isToday } from 'date-fns'
 import { useMemo } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import OnlineToggleButton, { handleOnlineToggle } from '@/components/OnlineToggleButton'
 
 const Home = () => {
    const { user } = useUser()
@@ -45,7 +45,17 @@ const Home = () => {
    return (
       <Container>
          <View style={styles.container}>
-            {!user?.isOnline && <Text style={styles.offlineTitle}>You are Off-line</Text>}
+            {!user?.isOnline ? (
+               <Text style={styles.offlineTitle}>You are Off-line</Text>
+            ) : (
+               <Row containerStyle={{ justifyContent: 'space-between' }}>
+                  <Text />
+                  <Text style={[styles.offlineTitle, { marginLeft: 30 }]}>Online</Text>
+                  <TouchableOpacity onPress={() => handleOnlineToggle(user)}>
+                     <Text style={{ color: 'grey', fontWeight: '600' }}>Go Off-line</Text>
+                  </TouchableOpacity>
+               </Row>
+            )}
             {currentOrder && (
                <View>
                   <Animatable.Text
@@ -87,6 +97,11 @@ const Home = () => {
             </TouchableOpacity>
 
             {deliveredOrders.length > 0 && <EarningsData orders={deliveredOrders} />}
+            {deliveredOrders.length === 0 && !user?.isOnline && (
+               <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                  <OnlineToggleButton size={SIZES.width / 2} />
+               </View>
+            )}
          </View>
          <GoOnlineCircle />
       </Container>

@@ -2,11 +2,14 @@ import { TabBarIcon } from '@/components/TabBarIcon'
 import { Colors } from '@/constants/Colors'
 import { useOrders } from '@/hooks/useOrders'
 import { useUser } from '@/hooks/useUser'
+import { useUserListener } from '@/hooks/useUserListener'
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'
-import { Redirect, Tabs } from 'expo-router'
+import { Tabs } from 'expo-router'
 
 export default function TabLayout() {
-   const { loading, user } = useUser()
+   useUserListener()
+   const { loading } = useUser()
+
    useOrders()
    // useDriverLocation(user?.id!, (location) => {
    //    if (location) {
@@ -17,10 +20,6 @@ export default function TabLayout() {
    //    }
    // })
    if (loading) return null
-
-   if (!user || !user.isActive) {
-      return <Redirect href={'/login'} />
-   }
 
    // if (!user && backgroundPermission?.granted) return <Redirect href={'/(auth)/login'} />
    // if (user && !backgroundPermission?.granted) return <Redirect href={'/notlocation'} />

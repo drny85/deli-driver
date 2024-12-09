@@ -115,6 +115,7 @@ export interface Courier extends AppUser {
    busy?: boolean
    lastPictureChange?: string
    overridingPicture?: boolean
+   charges_enabled: boolean
    agreement?: string[]
    phoneNumberVerified: boolean
 }
@@ -172,8 +173,13 @@ export interface Business {
    lastOpened?: string
    createdAt: string
    requiredOTPForPickup?: boolean
-   couriers: string[]
+   couriers: BusinessCourier[]
    otpOverride?: number | null
+}
+
+export type BusinessCourier = {
+   id: string
+   active: boolean
 }
 
 export interface BusinessDay {

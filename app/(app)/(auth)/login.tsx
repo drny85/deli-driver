@@ -23,6 +23,8 @@ import { FontAwesome } from '@expo/vector-icons'
 import LottieView from 'lottie-react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { router } from 'expo-router'
+import Signup from './signup'
+import KeyboardScreen from '@/components/KeyboardScreen'
 const loginSchema = z.object({
    email: z.string().email(),
    password: z.string().min(6, { message: 'Password must be at least 6 characters long' })
@@ -30,7 +32,8 @@ const loginSchema = z.object({
 type LoginSchema = z.infer<typeof loginSchema>
 
 const Login = () => {
-   const { signIn, user } = useAuth()
+   const { signIn, user, isSigningUp, setIsSigningUp } = useAuth()
+   console.log('User Login: ', user, isSigningUp)
    const translateY = useSharedValue(0)
    const [showPassword, setShowPassword] = useState(false)
    const {
@@ -87,111 +90,108 @@ const Login = () => {
    }, [])
 
    useEffect(() => {
-      if (!router) return
-      if (user && !user.emailVerified) {
-         router.replace('/verifyEmail')
-      } else if (
-         user &&
-         user.emailVerified &&
-         !user.isActive &&
-         !user.name &&
-         !user.lastName &&
-         !user.transportation &&
-         !user.image
-      ) {
-         router.replace('/onboarding')
-      } else if (
-         user &&
-         user.emailVerified &&
-         user.image &&
-         user.name &&
-         user.lastName &&
-         user.transportation &&
-         !user.isActive
-      ) {
-         router.replace('/stripe-onboarding')
-      }
+      // if (!router) return
+      // if (user && !user.emailVerified) {
+      //    router.replace('/verifyEmail')
+      // } else if (
+      //    user &&
+      //    user.emailVerified &&
+      //    !user.isActive &&
+      //    !user.name &&
+      //    !user.lastName &&
+      //    !user.transportation &&
+      //    !user.image
+      // ) {
+      //    router.replace('/onboarding')
+      // } else if (
+      //    user &&
+      //    user.emailVerified &&
+      //    user.image &&
+      //    user.name &&
+      //    user.lastName &&
+      //    user.transportation &&
+      //    !user.isActive
+      // ) {
+      //    router.replace('/stripe-onboarding')
+      // }
    }, [user, router])
-   return (
-      <Container>
-         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <KeyboardAvoidingView
-               style={{ flex: 1, paddingHorizontal: SIZES.md }}
-               keyboardVerticalOffset={40}
-               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-               <Animated.View style={[styles.lottieContainer, animate]}>
-                  <LottieView
-                     style={styles.lottie}
-                     source={require('@/assets/animations/delivery_guy.json')}
-                     autoPlay
-                     loop
-                  />
-               </Animated.View>
-               <View
-                  style={{
-                     flex: 1,
-                     justifyContent: 'center',
-                     alignItems: 'center',
-                     gap: SIZES.lg
-                  }}>
-                  <Controller
-                     name="email"
-                     control={control}
-                     render={({ field: { onChange, value } }) => (
-                        <Input
-                           autoCapitalize="none"
-                           title="Email"
-                           placeholder="Email Address"
-                           value={value}
-                           error={errors.email?.message}
-                           onChangeText={(text) => onChange(text.toLowerCase())}
-                        />
-                     )}
-                  />
-                  <Controller
-                     name="password"
-                     control={control}
-                     render={({ field: { onChange, value } }) => (
-                        <Input
-                           autoCapitalize="none"
-                           title="password"
-                           secureTextEntry={!showPassword}
-                           placeholder="Password"
-                           value={value}
-                           error={errors.password?.message}
-                           onChangeText={onChange}
-                           RightIcon={
-                              <FontAwesome
-                                 onPress={() => setShowPassword((prev) => !prev)}
-                                 name={showPassword ? 'eye-slash' : 'eye'}
-                                 size={20}
-                                 color={Colors.main}
-                              />
-                           }
-                        />
-                     )}
-                  />
 
-                  <View style={{ width: '60%' }}>
-                     <Button
-                        disabled={isSubmitting}
-                        contentContainerStyle={{ borderRadius: SIZES.lg }}
-                        title="Login"
-                        onPress={handleSubmit(handleLogin)}
+   if (isSigningUp) return <Signup />
+   return (
+      <KeyboardScreen>
+         <View style={{ flex: 1, paddingHorizontal: SIZES.md }}>
+            <Animated.View style={[styles.lottieContainer, animate]}>
+               <LottieView
+                  style={styles.lottie}
+                  source={require('@/assets/animations/delivery_guy.json')}
+                  autoPlay
+                  loop
+               />
+            </Animated.View>
+            <View
+               style={{
+                  flex: 1,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: SIZES.lg
+               }}>
+               <Controller
+                  name="email"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                     <Input
+                        autoCapitalize="none"
+                        title="Email"
+                        placeholder="Email Address"
+                        value={value}
+                        error={errors.email?.message}
+                        onChangeText={(text) => onChange(text.toLowerCase())}
                      />
-                  </View>
-                  <View style={styles.bottom}>
-                     <Text style={styles.bottomText}>Dont have an account?</Text>
-                     <Text
-                        onPress={() => router.push('/signup')}
-                        style={[styles.bottomText, { fontSize: 20 }]}>
-                        Sign Up
-                     </Text>
-                  </View>
+                  )}
+               />
+               <Controller
+                  name="password"
+                  control={control}
+                  render={({ field: { onChange, value } }) => (
+                     <Input
+                        autoCapitalize="none"
+                        title="password"
+                        secureTextEntry={!showPassword}
+                        placeholder="Password"
+                        value={value}
+                        error={errors.password?.message}
+                        onChangeText={onChange}
+                        RightIcon={
+                           <FontAwesome
+                              onPress={() => setShowPassword((prev) => !prev)}
+                              name={showPassword ? 'eye-slash' : 'eye'}
+                              size={20}
+                              color={Colors.main}
+                           />
+                        }
+                     />
+                  )}
+               />
+
+               <View style={{ width: '60%' }}>
+                  <Button
+                     disabled={isSubmitting}
+                     contentContainerStyle={{ borderRadius: SIZES.lg }}
+                     title="Login"
+                     onPress={handleSubmit(handleLogin)}
+                  />
                </View>
-            </KeyboardAvoidingView>
-         </TouchableWithoutFeedback>
-      </Container>
+               <View style={styles.bottom}>
+                  <Text style={styles.bottomText}>Dont have an account?</Text>
+                  <Text
+                     onPress={() => setIsSigningUp(true)}
+                     style={[styles.bottomText, { fontSize: 20 }]}>
+                     Sign Up
+                  </Text>
+               </View>
+            </View>
+         </View>
+      </KeyboardScreen>
    )
 }
 

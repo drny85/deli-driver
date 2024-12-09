@@ -7,6 +7,8 @@ import * as SplashScreen from 'expo-splash-screen'
 import { useCallback } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { useCourierNotification } from '@/hooks/useCourrierNotification'
+import { useUserListener } from '@/hooks/useUserListener'
+import { use } from 'i18next'
 SplashScreen.preventAutoHideAsync()
 
 export const unstable_settings = {
@@ -27,11 +29,11 @@ export default function App() {
    }
 
    return (
-      <BottomSheetModalProvider>
-         <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>
+      <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>
+         <BottomSheetModalProvider>
             <RootLayout />
-         </GestureHandlerRootView>
-      </BottomSheetModalProvider>
+         </BottomSheetModalProvider>
+      </GestureHandlerRootView>
    )
 }
 
@@ -39,6 +41,7 @@ export default function App() {
 
 function RootLayout() {
    useCourierNotification()
+   useUserListener()
    return (
       <Stack screenOptions={{ animation: 'slide_from_bottom' }} initialRouteName="(tabs)">
          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

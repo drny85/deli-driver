@@ -14,7 +14,7 @@ const VerifyEmail = () => {
 
    useEffect(() => {
       if (user && user.emailVerified && !user.isActive) {
-         router.replace('/(auth)/onboarding')
+         router.replace('/onboarding')
       }
    }, [user, auth.currentUser])
    return (
@@ -58,9 +58,13 @@ const VerifyEmail = () => {
                contentTextStyle={{ paddingHorizontal: SIZES.lg * 2, fontWeight: '700' }}
                contentContainerStyle={{ borderRadius: SIZES.lg * 2 }}
                onPress={() => {
-                  if (auth.currentUser?.emailVerified) {
-                     setUser({ ...user!, emailVerified: auth.currentUser.emailVerified })
-                  }
+                  auth.currentUser?.reload().then(() => {
+                     if (user)
+                        setUser({
+                           ...user,
+                           emailVerified: auth.currentUser?.emailVerified || false
+                        })
+                  })
                }}
             />
          </View>

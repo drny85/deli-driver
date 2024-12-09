@@ -60,6 +60,7 @@ const Onboarding = () => {
       },
       resolver: zodResolver(onboardingFirstSchema)
    })
+   console.log(errors)
 
    // console.log(
    //   Object.entries(user!).map((val, index) => {
@@ -71,6 +72,7 @@ const Onboarding = () => {
    const handleSave = async (values: FirstSchema) => {
       try {
          if (!user) return
+         console.log(values)
          const updated = await updateCourier({ ...user, ...values })
          if (updated) {
             router.replace('/stripe-onboarding')
@@ -126,6 +128,17 @@ const Onboarding = () => {
                      transition={1000}
                   />
                </TouchableOpacity>
+               {errors && errors.image && (
+                  <Text
+                     style={{
+                        textAlign: 'center',
+                        marginTop: 16,
+                        color: 'orange',
+                        fontWeight: '700'
+                     }}>
+                     Image is required
+                  </Text>
+               )}
             </View>
             <ScrollView contentContainerStyle={{ padding: SIZES.sm, gap: SIZES.md }}>
                <Controller
